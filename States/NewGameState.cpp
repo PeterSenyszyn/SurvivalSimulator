@@ -8,35 +8,40 @@ State(stack, context)
 {
     setStateId(States::NewGame);
 
-    auto& guiManager = *context.guiManager;
+    initGui();
+}
+
+void NewGameState::initGui()
+{
+    auto& guiManager = *getContext().guiManager;
 
     auto tempMainWindow = guiManager.createWindow(States::NewGame, "mainWindow", sfg::Window::Style::BACKGROUND);
-    tempMainWindow->SetPosition(sf::Vector2f(100, 50));
+    tempMainWindow->SetPosition(sf::Vector2f(adjustForResX(100), adjustForResY(50)));
 
-    auto box = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 25.f);
+    auto box = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, adjustForResY(25.f));
 
     nameLabel = sfg::Label::Create("Player Name: ");
     nameLabel->SetId("nameLabel");
-    guiManager.setDesktopProperty(std::string("#nameLabel"), std::string("FontSize"), 20.f);
+    guiManager.setDesktopProperty(std::string("#nameLabel"), std::string("FontSize"), adjustForResX(20.f));
 
     nameEntry = sfg::Entry::Create();
     nameEntry->SetId("nameEntry");
-    nameEntry->SetRequisition(sf::Vector2f(495.f, 0.f));
-    nameEntry->SetMaximumLength(35);
-    guiManager.setDesktopProperty(std::string("#nameEntry"), std::string("FontSize"), 25.f);
+    nameEntry->SetRequisition(sf::Vector2f(adjustForResX(495.f), adjustForResY(0.f)));
+    nameEntry->SetMaximumLength(adjustForResX(35));
+    guiManager.setDesktopProperty(std::string("#nameEntry"), std::string("FontSize"), adjustForResX(25.f));
 
     genderBox = sfg::ComboBox::Create();
     genderBox->SetId("genderBox");
     genderBox->AppendItem("Male");
     genderBox->AppendItem("Female");
     genderBox->SelectItem(0);
-    guiManager.setDesktopProperty(std::string("#genderBox"), std::string("FontSize"), 20.f);
+    guiManager.setDesktopProperty(std::string("#genderBox"), std::string("FontSize"), adjustForResX(20.f));
 
     goButton = sfg::Button::Create("Start Exploring");
-    goButton->SetRequisition(sf::Vector2f(200, 100));
-    goButton->GetSignal(sfg::Button::OnLeftClick).Connect([&] { requestStackChange(States::Loading); } );
+    goButton->SetRequisition(sf::Vector2f(adjustForResX(200), adjustForResY(100)));
+    goButton->GetSignal(sfg::Button::OnLeftClick).Connect([&] { requestStackPush(States::Loading); } );
     goButton->SetId("goButton");
-    guiManager.setDesktopProperty(std::string("#goButton"), std::string("FontSize"), 20.f);
+    guiManager.setDesktopProperty(std::string("#goButton"), std::string("FontSize"), adjustForResX(20.f));
 
     box->Pack(nameLabel);
     box->Pack(nameEntry);
@@ -49,7 +54,7 @@ State(stack, context)
 bool NewGameState::handleEvent(const sf::Event& event)
 {
     if (getContext().keyboardMap->isActive(Keys::ESCAPEPRESS))
-        requestStackChange(States::Intro);
+        requestStackPush(States::Intro);
 
     return true;
 }

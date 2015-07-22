@@ -25,10 +25,13 @@ public:
     static std::shared_ptr<sfg::Window> createWindow(States::ID stateID, const std::string& id, std::uint8_t style);
     static std::shared_ptr<sfg::Window> getWindow(States::ID stateID, const std::string& id);
 
+    static void resetWindows();
+
     template <class T>
     void setDesktopProperty(std::string selector, std::string property, const T& value) { m_desktop.SetProperty(selector, property, value); }
 
     void setStateWindowsShow(States::ID stateID, bool show);
+    void hideAllWindows();
 
     struct StateGuiContext
     {

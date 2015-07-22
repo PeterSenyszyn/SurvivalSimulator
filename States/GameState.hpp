@@ -11,8 +11,10 @@ public:
     static void setDoneLoading(bool done) { m_doneLoading = done; }
     static bool getDoneLoading() { return m_doneLoading; }
 
-    bool handleEvent(const sf::Event& event);
-    bool update(sf::Time dt);
+    virtual void initGui();
+
+    virtual bool handleEvent(const sf::Event& event);
+    virtual bool update(sf::Time dt);
     virtual void draw();
 
 private:

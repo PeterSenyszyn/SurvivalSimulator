@@ -79,4 +79,14 @@ private:
     static sf::Vector2i m_mouseCoords;
 };
 
+static float adjustForResX(float val)
+{
+    return val * (static_cast<float>(Application::getCurrentResolution().x) / 1920.f);
+}
+
+static float adjustForResY(float val)
+{
+    return val * (static_cast<float>(Application::getCurrentResolution().y) / 1080.f);
+}
+
 #endif // APPLICATION_H

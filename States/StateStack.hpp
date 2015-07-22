@@ -40,9 +40,9 @@ public:
     void draw();
 
     void pushState(States::ID stateID);
-    void changeState(States::ID stateID);
     void popState();
     void clearStates();
+    void scaleGui();
 
     bool isEmpty() const;
 

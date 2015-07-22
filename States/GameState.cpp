@@ -11,6 +11,13 @@ State(stack, context)
 
     context.player->setActive(true);
     context.world->setActive(true);
+
+    initGui();
+}
+
+void GameState::initGui()
+{
+
 }
 
 bool GameState::handleEvent(const sf::Event& event)
@@ -24,7 +31,7 @@ bool GameState::handleEvent(const sf::Event& event)
 
         m_doneLoading = false;
 
-        requestStackChange(States::Intro);
+        requestStackPush(States::Intro);
     }
 
     return true;

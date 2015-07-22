@@ -12,10 +12,10 @@ ExamineMenu::ExamineMenu(Player* player)
     m_desktop.GetEngine().GetResourceManager().SetDefaultFont(m_font);
     m_desktop.SetProperty("*", "FontName", "Assets/font.ttf");
 
-    m_buttonBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
+    m_buttonBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, adjustForResY(10.f));
 
     m_actionProgressBar = sfg::ProgressBar::Create();
-    m_actionProgressBar->SetRequisition(sf::Vector2f(100, 20));
+    m_actionProgressBar->SetRequisition(sf::Vector2f(adjustForResX(100), adjustForResY(20)));
 
     m_window = sfg::Window::Create();
     m_window->SetTitle("ExamineMenu");
@@ -38,7 +38,7 @@ void ExamineMenu::init(TileMap::TileEntityRef::Ptr entityRef, Player* player)
 
     m_buttonBox->RemoveAll();
     m_actionProgressBar = sfg::ProgressBar::Create();
-    m_actionProgressBar->SetRequisition(sf::Vector2f(100, 20));
+    m_actionProgressBar->SetRequisition(sf::Vector2f(adjustForResX(100), adjustForResY(20)));
     m_actionManager.resetAllGui();
 
     m_window->SetTitle(entityRef->tileName);
@@ -110,7 +110,7 @@ void ExamineMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
 void ExamineMenu::initActions(Player* player)
 {
     //For clicking on tile entities
-    m_actionManager.createAction(5.0, "harvestwood", "Harvest Wood", std::bind(&Player::addItem, player, 0));
+    m_actionManager.createAction(5.0, "harvestwood", "Harvest Wood", std::bind(&Player::addItem, player, Item::create(Item::Item_Dictionary::WOOD, "Wood", "Assets/logs.png", "Assets/logs.png", false, true, true)));
     m_actionManager.createAction(0.0, "close", "Close", []{});
 
     //For clicking on items that dropped on the ground

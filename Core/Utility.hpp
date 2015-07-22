@@ -1,6 +1,8 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
+//#include <Application.hpp>
+
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -157,6 +159,5 @@ int randomInt(int minNum, int maxNum);
 //Vector operations
 float length(sf::Vector2f vector);
 sf::Vector2f unitVector(sf::Vector2f vector);
-
 
 #endif // UTILITY_H

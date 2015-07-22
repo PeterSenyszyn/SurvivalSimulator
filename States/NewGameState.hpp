@@ -8,6 +8,8 @@ class NewGameState : public State
 public:
     NewGameState(StateStack& stack, Context context);
 
+    virtual void initGui();
+
     bool handleEvent(const sf::Event& event);
     bool update(sf::Time dt);
     virtual void draw();

@@ -52,20 +52,27 @@ void StateStack::pushState(States::ID stateID)
 
     m_currentStateId = stateID;
 
-    m_pendingList.push_back(PendingChange(Push, stateID));
-}
+    bool foundId = false;
 
-void StateStack::changeState(States::ID stateID)
-{
-    if (m_currentStateId != States::None)
+    if (m_stack.empty())
+        m_pendingList.push_back(PendingChange(Push, stateID));
+
+    else
     {
-        m_context.guiManager->setStateWindowsShow(m_currentStateId, false);
-        m_context.guiManager->setStateWindowsShow(stateID, true);
+        for (const auto& iter : m_stack)
+        {
+            //Change
+            if (iter->getStateId() == stateID)
+            {
+                m_pendingList.push_back(PendingChange(Change, stateID));
+                foundId = true;
+                break;
+            }
+        }
+
+        if (!foundId)
+            m_pendingList.push_back(PendingChange(Push, stateID));
     }
-
-    m_currentStateId = stateID;
-
-    m_pendingList.push_back(PendingChange(Change, stateID));
 }
 
 void StateStack::popState()
@@ -78,6 +85,17 @@ void StateStack::clearStates()
     m_pendingList.push_back(PendingChange(Clear));
 
     m_currentStateId = States::None;
+}
+
+void StateStack::scaleGui()
+{
+    m_context.guiManager->resetWindows();
+
+    for (const auto& iter : m_stack)
+        iter->initGui();
+
+    m_context.guiManager->hideAllWindows();
+    m_context.guiManager->setStateWindowsShow(m_currentStateId, true);
 }
 
 bool StateStack::isEmpty() const

@@ -11,12 +11,13 @@ m_sprintSpeed(140.0f),
 m_stamina(100.0f),
 m_requiredStaminaToSprint(20.0f),
 m_baseStaminaDegen(9.0f),
-m_baseStaminaRegen(3.50f),
+m_baseStaminaRegen(3.5f),
 m_inventoryWeight(0.0),
 m_isSprinting(false),
 m_isWalking(false),
 m_isCurrentlyMoving(false),
-m_examineMenu(this)
+m_examineMenu(this),
+m_inventory(*this)
 {
     m_image.loadFromFile("Assets/Player/player_temp.png");
     m_image.createMaskFromColor(sf::Color::White);
@@ -24,7 +25,7 @@ m_examineMenu(this)
     m_animationSteps.loadFromImage(m_image);
 
     m_sprite.setTexture(m_animationSteps);
-    m_sprite.setPosition(1200, 100);
+    m_sprite.setPosition(adjustForResX(1600), adjustForResY(100));
 }
 
 void Player::init()
@@ -32,9 +33,9 @@ void Player::init()
     m_inventory.init();
 }
 
-void Player::addItem(int itemId)
+void Player::addItem(Item::Ptr item)
 {
-    m_inventory.addItem(Item::create(Item::Item_Dictionary::WOOD, "Wood", "Assets/logs.png", "Assets/logs.png", false, true, true));
+    m_inventory.addItem(item);
 }
 
 void Player::handleEvents(const sf::Event& event)

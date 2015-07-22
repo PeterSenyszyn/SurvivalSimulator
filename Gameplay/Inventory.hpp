@@ -12,6 +12,8 @@
 #include <WorldCell.hpp>
 #include <Item.hpp>
 
+class Player;
+
 class RightClickAction
 {
 public:
@@ -74,6 +76,8 @@ private:
 class Inventory : public sf::Drawable
 {
 public:
+    Inventory(Player& playerContext);
+
     struct Grid
     {
         Grid(int pos, Item::Item_Dictionary type, const std::string& name) : pos(pos), numItemsInStack(1), clickedOn(false), type(type), name(name)
@@ -156,12 +160,17 @@ private:
     sfg::Label::Ptr m_encumbranceLabel;
     sfg::ProgressBar::Ptr m_encumbranceBar;
 
+    sfg::Label::Ptr m_staminaLabel;
+    sfg::ProgressBar::Ptr m_staminaBar;
+
     bool m_active;
     bool m_needsUpdate;
 
     float m_weight;
 
     std::vector<std::shared_ptr<Grid> > m_grid;
+
+    Player* playerContext;
 };
 
 #endif // INVENTORY_H

@@ -1,6 +1,4 @@
 #include <Application.hpp>
-#include <StringHelpers.hpp>
-#include <Utility.hpp>
 #include <MenuStarManager.hpp>
 
 #include <IntroState.hpp>
@@ -12,7 +10,7 @@
 #include <iostream>
 
 sf::Vector2u Application::m_windowOptimalNativeRes = sf::Vector2u(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height);
-sf::Vector2u Application::m_windowCurrentRes = sf::Vector2u(1920, 1080);
+sf::Vector2u Application::m_windowCurrentRes = sf::Vector2u(1024, 768);
 sf::Vector2f Application::m_resMultiplier = sf::Vector2f(1, 1);
 sf::Vector2i Application::m_mouseCoords;
 
@@ -21,7 +19,7 @@ MenuStarManager Application::m_menuStarManager(200);
 bool Application::m_resized = false;
 
 Application::Application() :
-m_window(sf::VideoMode(1920, 1080), "Spatia - v0.1", !sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close),
+m_window(sf::VideoMode(1024, 768), "Spatia - v0.1", !sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close),
 m_stateStack(State::Context(m_window, m_textures, m_fonts, m_musicPlayer, m_soundPlayer, m_keyboardMap, m_settingsParser, m_guiManager, m_player, m_world)),
 m_fpsOn(false)
 {
@@ -124,7 +122,7 @@ void Application::updateFps(sf::Time dt)
 
     currentTime = 0;
 
-    m_fpsText.setString(toString(fps));
+    m_fpsText.setString(std::to_string(fps));
 
     if (fps >= 60)
         m_fpsText.setColor(sf::Color::Green);

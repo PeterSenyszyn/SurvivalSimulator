@@ -10,6 +10,8 @@ class LoadingScreenState : public State
 public:
     LoadingScreenState(StateStack& stack, Context context);
 
+    virtual void initGui();
+
     virtual bool update(sf::Time dt);
     virtual bool handleEvent(const sf::Event& event);
     virtual void draw();

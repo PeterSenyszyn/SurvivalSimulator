@@ -55,6 +55,8 @@ public:
     State(StateStack& stack, Context context);
     virtual ~State() {};
 
+    virtual void initGui() = 0;
+
     virtual void draw() = 0;
     virtual bool update(sf::Time dt) = 0;
     virtual bool handleEvent(const sf::Event& event) = 0;
@@ -62,11 +64,13 @@ public:
     void setStateId(States::ID stateId) { m_stateId = stateId; }
     States::ID getStateId() { return m_stateId; }
 
+    StateStack& getStack() { return *m_stack; }
+
 protected:
     void requestStackPush(States::ID stateID);
-    void requestStackChange(States::ID stateID);
     void requestStackPop();
-    void requestStateClear();
+    void requestStackClear();
+    void requestGuiScale();
 
     Context getContext() const;
 

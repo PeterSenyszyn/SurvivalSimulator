@@ -31,19 +31,19 @@ void State::requestStackPush(States::ID stateID)
     m_stack->pushState(stateID);
 }
 
-void State::requestStackChange(States::ID stateID)
-{
-    m_stack->changeState(stateID);
-}
-
 void State::requestStackPop()
 {
     m_stack->popState();
 }
 
-void State::requestStateClear()
+void State::requestStackClear()
 {
     m_stack->clearStates();
+}
+
+void State::requestGuiScale()
+{
+    m_stack->scaleGui();
 }
 
 State::Context State::getContext() const

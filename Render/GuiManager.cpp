@@ -68,10 +68,30 @@ std::shared_ptr<sfg::Window> GuiManager::getWindow(States::ID stateID, const std
     return context->windows[id];
 }
 
+void GuiManager::resetWindows()
+{
+    for (auto iter = m_stateGuiContexts.begin(); iter != m_stateGuiContexts.end(); ++iter)
+    {
+        for (auto iter2 = (*iter).second->windows.begin(); iter2 != (*iter).second->windows.end(); ++iter2)
+            (*iter).second->windows.erase(iter2);
+    }
+
+    m_desktop.RemoveAll();
+}
+
 void GuiManager::setStateWindowsShow(States::ID stateID, bool show)
 {
     auto context = m_stateGuiContexts[stateID];
 
     for (const auto& iter : context->windows)
         iter.second->Show(show);
+}
+
+void GuiManager::hideAllWindows()
+{
+    for (const auto& iter : m_stateGuiContexts)
+    {
+        for (const auto& iter2 : iter.second->windows)
+            iter2.second->Show(false);
+    }
 }

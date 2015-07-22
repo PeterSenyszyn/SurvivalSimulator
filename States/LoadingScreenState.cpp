@@ -1,4 +1,5 @@
 #include <LoadingScreenState.hpp>
+#include <Utility.hpp>
 
 LoadingScreenState::LoadingScreenState(StateStack& stack, Context context) :
 State(stack, context),
@@ -37,16 +38,21 @@ m_elapsedTime(0.0)
     context.world->pushWorldCell(mainCell);
     context.world->setCurrentCell("maincell");
 
-    context.player->init();
+    initGui();
+
+    GameState::setDoneLoading(true);
+}
+
+void LoadingScreenState::initGui()
+{
+    getContext().player->init();
 
     m_loadingFont.loadFromFile("Assets/font.ttf");
     m_loadingText.setFont(m_loadingFont);
-    m_loadingText.setCharacterSize(50);
+    m_loadingText.setCharacterSize(adjustForResX(50));
     m_loadingText.setColor(sf::Color::White);
-    m_loadingText.setPosition(-320, (1080 / 2) - 50);
+    m_loadingText.setPosition(adjustForResX(-320), adjustForResY((1080 / 2) - 50));
     m_loadingText.setString("Building World");
-
-    GameState::setDoneLoading(true);
 }
 
 bool LoadingScreenState::update(sf::Time dt)
@@ -55,21 +61,21 @@ bool LoadingScreenState::update(sf::Time dt)
 
     if (m_elapsedTime < 4.0)
     {
-        m_loadingText.move(90 * dt.asSeconds(), 0);
+        m_loadingText.move(adjustForResX(90 * dt.asSeconds()), 0);
     }
 
     else if (m_elapsedTime >= 4.0 && m_elapsedTime < 8.0)
     {
         m_loadingText.setString("Loading Player");
 
-        m_loadingText.move(90 * dt.asSeconds(), 0);
+        m_loadingText.move(adjustForResX(90 * dt.asSeconds()), 0);
     }
 
     else if (m_elapsedTime >= 8.0 && m_elapsedTime < 12.0)
     {
         m_loadingText.setString("Initializing GUI");
 
-        m_loadingText.move(90 * dt.asSeconds(), 0);
+        m_loadingText.move(adjustForResX(90 * dt.asSeconds()), 0);
     }
 
     else if (m_elapsedTime >= 12.0 && m_elapsedTime < 18.5)
@@ -77,13 +83,13 @@ bool LoadingScreenState::update(sf::Time dt)
         m_loadingText.setString("Done, good luck!");
 
         if (m_elapsedTime >= 13.0 && m_elapsedTime < 14.0)
-            m_loadingText.move(-(90 * dt.asSeconds()), 0);
+            m_loadingText.move(adjustForResX(-(90 * dt.asSeconds())), 0);
 
         else if (m_elapsedTime >= 14.0 && m_elapsedTime < 15.0)
-            m_loadingText.move(250 * dt.asSeconds(), 0);
+            m_loadingText.move(adjustForResX(250 * dt.asSeconds()), 0);
 
         else if (m_elapsedTime >= 15.0 && m_elapsedTime < 16.0)
-            m_loadingText.move(1200 * dt.asSeconds(), 0);
+            m_loadingText.move(adjustForResX(1200 * dt.asSeconds()), 0);
     }
 
     //Over 5 secs? Go ahead and load the game state
@@ -91,7 +97,7 @@ bool LoadingScreenState::update(sf::Time dt)
     {
         getContext().player->setActive(true);
 
-        requestStackChange(States::Game);
+        requestStackPush(States::Game);
     }
 
     return true;
@@ -105,7 +111,7 @@ bool LoadingScreenState::handleEvent(const sf::Event& event)
     {
         getContext().player->setActive(true);
 
-        requestStackChange(States::Game);
+        requestStackPush(States::Game);
     }
 
     return true;

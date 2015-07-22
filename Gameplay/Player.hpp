@@ -22,10 +22,12 @@ public:
 
     Inventory& getInventory() { return m_inventory; }
 
-    void addItem(int itemId);
+    void addItem(Item::Ptr item);
 
     bool getActive() { return m_active; }
     void setActive(bool active) { m_active = active; if (!active) m_inventory.setActive(active); }
+
+    const float getStamina() const { return m_stamina; }
 
     int checkDistanceTileRef();
 

@@ -4,6 +4,12 @@
 
 #include <cstring>
 
+Inventory::Inventory(Player& playerContext) :
+playerContext(&playerContext)
+{
+
+}
+
 void Inventory::init()
 {
     m_weight = 0.0;
@@ -21,12 +27,12 @@ void Inventory::init()
 
     m_inventoryScrollMenu = sfg::ScrolledWindow::Create();
     m_inventoryScrollMenu->SetScrollbarPolicy(sfg::ScrolledWindow::HORIZONTAL_NEVER | sfg::ScrolledWindow::VERTICAL_AUTOMATIC);
-    m_inventoryScrollMenu->SetRequisition(sf::Vector2f(325, 325));
+    m_inventoryScrollMenu->SetRequisition(sf::Vector2f(adjustForResX(325), adjustForResY(325)));
     m_inventoryScrollMenu->SetId("inventoryscroll");
 
     m_statusScrollMenu = sfg::ScrolledWindow::Create();
     m_statusScrollMenu->SetScrollbarPolicy(sfg::ScrolledWindow::HORIZONTAL_NEVER | sfg::ScrolledWindow::VERTICAL_AUTOMATIC);
-    m_statusScrollMenu->SetRequisition(sf::Vector2f(325, 325));
+    m_statusScrollMenu->SetRequisition(sf::Vector2f(adjustForResX(325), adjustForResY(325)));
     m_statusScrollMenu->SetId("statusscroll");
 
     m_itemClickMenu = sfg::Window::Create();
@@ -34,64 +40,75 @@ void Inventory::init()
     m_itemClickMenu->SetStyle(sfg::Window::Style::TITLEBAR | sfg::Window::Style::BACKGROUND);
     m_itemClickMenu->SetId("rightclick");
 
-    m_itemClickBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
+    m_itemClickBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, adjustForResY(10.f));
 
     m_itemClickMenu->Add(m_itemClickBox);
 
     m_table = sfg::Table::Create();
-    m_table->SetRowSpacings(5.f);
-    m_table->SetColumnSpacings(5.f);
-    m_table->SetRequisition(sf::Vector2f(375, 375));
+    m_table->SetRowSpacings(adjustForResX(5.f));
+    m_table->SetColumnSpacings(adjustForResY(5.f));
+    m_table->SetRequisition(sf::Vector2f(adjustForResX(375), adjustForResX(375)));
 
     //status stuff
     m_statusTable = sfg::Table::Create();
-    m_statusTable->SetRowSpacings(10.f);
-    m_statusTable->SetColumnSpacings(10.f);
-    m_statusTable->SetRequisition(sf::Vector2f(375, 375));
+    m_statusTable->SetRowSpacings(adjustForResX(10.f));
+    m_statusTable->SetColumnSpacings(adjustForResY(10.f));
+    m_statusTable->SetRequisition(sf::Vector2f(adjustForResX(375), adjustForResY(375)));
 
     m_healthLabel = sfg::Label::Create("Health");
     m_healthLabel->SetId("healthlabel");
 
     m_healthBar = sfg::ProgressBar::Create();
     m_healthBar->SetFraction(100.0);
-    m_healthBar->SetRequisition(sf::Vector2f(90, 10));
+    m_healthBar->SetRequisition(sf::Vector2f(adjustForResX(90), adjustForResY(10)));
     m_healthBar->SetId("healthbar");
 
-    m_statusTable->Attach(m_healthLabel, sf::Rect<sf::Uint32>(0, 0, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(10.f, 10.f));
-    m_statusTable->Attach(m_healthBar, sf::Rect<sf::Uint32>(1, 0, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(10.f, 10.f));
+    m_statusTable->Attach(m_healthLabel, sf::Rect<sf::Uint32>(0, 0, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(adjustForResX(10.f), adjustForResY(10.f)));
+    m_statusTable->Attach(m_healthBar, sf::Rect<sf::Uint32>(1, 0, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(adjustForResX(10.f), adjustForResY(10.f)));
 
     m_hungerLabel = sfg::Label::Create("Hunger");
     m_hungerLabel->SetId("hungerlabel");
 
     m_hungerBar = sfg::ProgressBar::Create();
     m_hungerBar->SetFraction(100.0);
-    m_hungerBar->SetRequisition(sf::Vector2f(90, 10));
+    m_hungerBar->SetRequisition(sf::Vector2f(adjustForResX(90), adjustForResY(10)));
     m_hungerBar->SetId("hungerbar");
 
-    m_statusTable->Attach(m_hungerLabel, sf::Rect<sf::Uint32>(2, 0, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(10.f, 10.f));
-    m_statusTable->Attach(m_hungerBar, sf::Rect<sf::Uint32>(3, 0, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(10.f, 10.f));
+    m_statusTable->Attach(m_hungerLabel, sf::Rect<sf::Uint32>(2, 0, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(adjustForResX(10.f), adjustForResY(10.f)));
+    m_statusTable->Attach(m_hungerBar, sf::Rect<sf::Uint32>(3, 0, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(adjustForResX(10.f), adjustForResY(10.f)));
 
     m_thirstLabel = sfg::Label::Create("Thirst");
     m_thirstLabel->SetId("thirstlabel");
 
     m_thirstBar = sfg::ProgressBar::Create();
     m_thirstBar->SetFraction(100.0);
-    m_thirstBar->SetRequisition(sf::Vector2f(90, 10));
+    m_thirstBar->SetRequisition(sf::Vector2f(adjustForResX(90), adjustForResX(10)));
     m_thirstBar->SetId("thirstbar");
 
-    m_statusTable->Attach(m_thirstLabel, sf::Rect<sf::Uint32>(0, 1, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(10.f, 10.f));
-    m_statusTable->Attach(m_thirstBar, sf::Rect<sf::Uint32>(1, 1, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(10.f, 10.f));
+    m_statusTable->Attach(m_thirstLabel, sf::Rect<sf::Uint32>(0, 1, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(adjustForResX(10.f), adjustForResY(10.f)));
+    m_statusTable->Attach(m_thirstBar, sf::Rect<sf::Uint32>(1, 1, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(adjustForResX(10.f), adjustForResY(10.f)));
 
     m_encumbranceLabel = sfg::Label::Create("Encumbrance");
-    m_encumbranceLabel->SetId("encumbranceLabel");
+    m_encumbranceLabel->SetId("encumbrancelabel");
 
     m_encumbranceBar = sfg::ProgressBar::Create();
     m_encumbranceBar->SetFraction(0.0);
-    m_encumbranceBar->SetRequisition(sf::Vector2f(90, 10));
+    m_encumbranceBar->SetRequisition(sf::Vector2f(adjustForResX(90), adjustForResY(10)));
     m_encumbranceBar->SetId("encumbranceBar");
 
-    m_statusTable->Attach(m_encumbranceLabel, sf::Rect<sf::Uint32>(2, 1, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(10.f, 10.f));
-    m_statusTable->Attach(m_encumbranceBar, sf::Rect<sf::Uint32>(3, 1, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(10.f, 10.f));
+    m_statusTable->Attach(m_encumbranceLabel, sf::Rect<sf::Uint32>(2, 1, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(adjustForResX(10.f), adjustForResY(10.f)));
+    m_statusTable->Attach(m_encumbranceBar, sf::Rect<sf::Uint32>(3, 1, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(adjustForResX(10.f), adjustForResY(10.f)));
+
+    m_staminaLabel = sfg::Label::Create("Stamina");
+    m_staminaLabel->SetId("staminalabel");
+
+    m_staminaBar = sfg::ProgressBar::Create();
+    m_staminaBar->SetFraction(100.0);
+    m_staminaBar->SetRequisition(sf::Vector2f(adjustForResX(90), adjustForResY(10)));
+    m_staminaBar->SetId("staminabar");
+
+    m_statusTable->Attach(m_staminaLabel, sf::Rect<sf::Uint32>(0, 2, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(adjustForResX(10.f), adjustForResY(10.f)));
+    m_statusTable->Attach(m_staminaBar, sf::Rect<sf::Uint32>(1, 2, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(adjustForResX(10.f), adjustForResY(10.f)));
 
     sfg::Context::Get().GetEngine().SetProperty(std::string("#playermenu"), std::string("BackgroundColor"), sf::Color(85, 87, 82, 200));
     sfg::Context::Get().GetEngine().SetProperty(std::string("#playermenu"), std::string("TitleBackgroundColor"), sf::Color(90, 106, 80, 220));
@@ -167,12 +184,15 @@ void Inventory::addItem(Item::Ptr item)
 
         m_grid[m_grid.size() - 1]->items.push_back(item);
         m_grid[m_grid.size() - 1]->itemLabel->GetSignal(sfg::Widget::OnRightClick).Connect(std::bind(&Inventory::onItemClicked, this, m_grid[m_grid.size() - 1]->type, m_grid.size() - 1));
-        m_grid[m_grid.size() - 1]->itemLabel->SetRequisition(sf::Vector2f(200, 200));
+        m_grid[m_grid.size() - 1]->itemLabel->SetRequisition(sf::Vector2f(adjustForResX(200), adjustForResY(200)));
         m_grid[m_grid.size() - 1]->itemLabel->SetId(item->getName());
-        m_table->Attach(m_grid[m_grid.size() - 1]->itemLabel, sf::Rect<sf::Uint32>(m_grid.size() - 1, m_grid.size() - 1, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(10.f, 10.f));
+        m_table->Attach(m_grid[m_grid.size() - 1]->itemLabel, sf::Rect<sf::Uint32>(m_grid.size() - 1, m_grid.size() - 1, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(adjustForResX(10.f), adjustForResY(10.f)));
     }
 
     m_weight += static_cast<int>(item->getItemId());
+
+    sfg::Context::Get().GetEngine().SetProperty(std::string("#Wood"), std::string("FontSize"), adjustForResX(18));
+    sfg::Context::Get().GetEngine().SetProperty(std::string("#Berries"), std::string("FontSize"), adjustForResX(18));
 }
 
 void Inventory::handleEvents(const sf::Event& event)
@@ -182,16 +202,65 @@ void Inventory::handleEvents(const sf::Event& event)
 
 void Inventory::update(sf::Time dt)
 {
-    m_desktop.Update(dt.asSeconds());
+    m_staminaBar->SetFraction(playerContext->getStamina() / 100);
 
-    sfg::Context::Get().GetEngine().SetProperty(std::string("#Wood"), std::string("FontSize"), 18);
-    sfg::Context::Get().GetEngine().SetProperty(std::string("#Berries", std::string("FontSize"), 18));
+    m_desktop.Update(dt.asSeconds());
 
     for (const auto& iter : m_grid)
         iter->itemLabel->SetText(iter->name + " x" + std::to_string(iter->numItemsInStack));
 
-    //Over the comfortable amount
-    if (m_weight > 90)
+    //Over the comfortable amount, start decreasing health and energy
+    static float weightTotalTime = 0.0;
+
+    //If weight over 90, decrease health by 1 every 5 seconds, and energy (to be decided)
+    if (m_weight > 90 && m_weight < 130)
+    {
+        weightTotalTime += dt.asSeconds();
+
+        if (weightTotalTime > 5.0)
+        {
+            m_healthBar->SetFraction(m_healthBar->GetFraction() - 0.01);
+
+            weightTotalTime = 0.0;
+        }
+    }
+
+    //If weight over 130, decrease health by 1 every 2.5 seconds. and energy (tbd)
+    else if (m_weight > 130 && m_weight < 160)
+    {
+        weightTotalTime += dt.asSeconds();
+
+        if (weightTotalTime > 2.5)
+        {
+            m_healthBar->SetFraction(m_healthBar->GetFraction() - 0.01);
+
+            weightTotalTime = 0.0;
+        }
+    }
+
+    else if (m_weight > 160 && m_weight < 200)
+    {
+        weightTotalTime += dt.asSeconds();
+
+        if (weightTotalTime > 1)
+        {
+            m_healthBar->SetFraction(m_healthBar->GetFraction() - 0.01);
+
+            weightTotalTime = 0.0;
+        }
+    }
+
+    else if (m_weight >= 200)
+    {
+        weightTotalTime += dt.asSeconds();
+
+        if (weightTotalTime > 0.25 / m_weight * 200)
+        {
+            m_healthBar->SetFraction(m_healthBar->GetFraction() - 0.01);
+
+            weightTotalTime = 0.0;
+        }
+    }
 }
 
 void Inventory::draw(sf::RenderTarget& target, sf::RenderStates states) const
