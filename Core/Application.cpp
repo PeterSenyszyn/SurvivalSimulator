@@ -10,20 +10,25 @@
 #include <iostream>
 
 sf::Vector2u Application::m_windowOptimalNativeRes = sf::Vector2u(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height);
-sf::Vector2u Application::m_windowCurrentRes = sf::Vector2u(1024, 768);
+sf::Vector2u Application::m_windowCurrentRes = sf::Vector2u(1920, 1080);
 sf::Vector2f Application::m_resMultiplier = sf::Vector2f(1, 1);
 sf::Vector2i Application::m_mouseCoords;
+sf::Vector2f Application::m_worldCoords;
 
 MenuStarManager Application::m_menuStarManager(200);
 
 bool Application::m_resized = false;
 
 Application::Application() :
-m_window(sf::VideoMode(1024, 768), "Spatia - v0.1", !sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close),
+//m_window(sf::VideoMode(1024, 768), "Spatia - v0.1", !sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close),
 m_stateStack(State::Context(m_window, m_textures, m_fonts, m_musicPlayer, m_soundPlayer, m_keyboardMap, m_settingsParser, m_guiManager, m_player, m_world)),
 m_fpsOn(false)
 {
     initKeys();
+
+    sf::ContextSettings contextSettings;
+    contextSettings.antialiasingLevel = 16;
+    m_window.create(sf::VideoMode(1920, 1080), "Survival Simulator - v0.11", !sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close, contextSettings);
 
     /*if (!m_settingsParser.loadFromFile("Assets/settings.dat"))
         std::cout << "wtfbbq" << std::endl;
@@ -90,7 +95,9 @@ void Application::update(sf::Time dt)
     if (currentState == States::Intro || currentState == States::NewGame || currentState == States::Settings || currentState == States::Loading)
         m_menuStarManager.update(dt);
 
-    m_mouseCoords = sf::Vector2i(sf::Mouse::getPosition(m_window).x, sf::Mouse::getPosition(m_window).y);
+    m_mouseCoords = sf::Mouse::getPosition(m_window);
+
+    m_worldCoords = m_window.mapPixelToCoords(m_mouseCoords, m_player.getCamera().getView());
 }
 
 void Application::render()
@@ -99,14 +106,17 @@ void Application::render()
 
     auto currentState = m_stateStack.getCurrentState();
 
+    if (currentState == States::Game)
+        m_window.setView(m_player.getCamera().getView());
+
     if (currentState == States::Intro || currentState == States::NewGame || currentState == States::Settings || currentState == States::Loading)
         m_menuStarManager.render(m_window);
 
     m_stateStack.draw();
 
-    m_guiManager.draw(m_window);
-
     m_window.setView(m_window.getDefaultView());
+
+    m_guiManager.draw(m_window);
 
     if (fpsOn())
         m_window.draw(m_fpsText);

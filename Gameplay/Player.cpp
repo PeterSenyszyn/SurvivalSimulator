@@ -17,7 +17,9 @@ m_isSprinting(false),
 m_isWalking(false),
 m_isCurrentlyMoving(false),
 m_examineMenu(this),
-m_inventory(*this)
+m_inventory(*this),
+m_camera(sf::FloatRect({ static_cast<int>(std::floor(adjustForResX(500))), static_cast<int>(std::floor(adjustForResY(300)))}, {static_cast<int>(std::floor(adjustForResX(1920))),
+                       static_cast<int>(std::floor(adjustForResY(1080)))}), m_sprite)
 {
     m_image.loadFromFile("Assets/Player/player_temp.png");
     m_image.createMaskFromColor(sf::Color::White);
@@ -25,7 +27,8 @@ m_inventory(*this)
     m_animationSteps.loadFromImage(m_image);
 
     m_sprite.setTexture(m_animationSteps);
-    m_sprite.setPosition(adjustForResX(1600), adjustForResY(100));
+
+    m_sprite.setPosition(static_cast<int>(std::floor(adjustForResX(500))), static_cast<int>(std::floor(adjustForResY(300))));
 }
 
 void Player::init()
@@ -77,15 +80,18 @@ void Player::update(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys, Wor
         updateInput(dt, keys, world);
         m_inventory.update(dt);
         m_examineMenu.update(dt, this);
+        m_camera.update(dt);
+
     }
 }
 
 void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     if (m_active)
+    {
+        target.draw(m_inventory, states);
         target.draw(m_sprite, states);
-
-    target.draw(m_inventory, states);
+    }
 }
 
 void Player::updateMovement(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys, World& world)
@@ -181,7 +187,7 @@ void Player::updateInput(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys
     {
         for (const auto& iter : world.getCurrentCell()->getWorldItems())
         {
-            if (iter.second->getSprite().getGlobalBounds().contains(sf::Vector2f(Application::getMouseCoords().x, Application::getMouseCoords().y)))
+            if (iter.second->getSprite().getGlobalBounds().contains(sf::Vector2f(Application::getWorldCoords().x, Application::getWorldCoords().y)))
             {
                 m_itemRef = iter.second;
                 m_itemRefId = iter.first;
@@ -192,7 +198,7 @@ void Player::updateInput(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys
 
         if (!ignore)
         {
-            m_entityRef = world.getCurrentCell()->getTileMap().getTileMouseOver(Application::getMouseCoords());
+            m_entityRef = world.getCurrentCell()->getTileMap().getTileMouseOver(Application::getWorldCoords());
 
             if (m_entityRef != nullptr)
                 m_examineMenu.init(m_entityRef, this);
@@ -214,7 +220,7 @@ void Player::onCollectPress(ExamineMenu::ActionManager& actionManager)
         }
 
         else
-            std::cout << "You're too far away to chop down the tree!" << std::endl;
+            std::cout << "You're too far away to interact with that object!" << std::endl;
     }
 }
 

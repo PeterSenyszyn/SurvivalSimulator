@@ -19,7 +19,7 @@ WorldCell::Ptr WorldCell::create(const std::string& id, bool current)
 void WorldCell::addWorldItem(Item::Ptr item)
 {
     item->setActive(true);
-    m_worldItems[std::to_string(m_worldItems.size()-1)] = item;
+    m_worldItems[std::to_string(m_worldItems.size() - 1)] = item;
 }
 
 void WorldCell::update(sf::Time dt)

@@ -57,7 +57,7 @@ public:
         return false;
     }
 
-    TileEntityRef::Ptr getTileMouseOver(sf::Vector2i& mouseCoords)
+    TileEntityRef::Ptr getTileMouseOver(sf::Vector2f& mouseCoords)
     {
         for (auto& iter : m_tiles)
         {

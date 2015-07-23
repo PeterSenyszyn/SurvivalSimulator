@@ -13,6 +13,8 @@ State(stack, context)
     context.world->setActive(true);
 
     initGui();
+
+    //context.window->setView(context.player->getCamera().getView());
 }
 
 void GameState::initGui()
@@ -30,6 +32,8 @@ bool GameState::handleEvent(const sf::Event& event)
         getContext().world->setActive(false);
 
         m_doneLoading = false;
+
+        getContext().window->setView(getContext().window->getDefaultView());
 
         requestStackPush(States::Intro);
     }
@@ -49,6 +53,7 @@ void GameState::draw()
 {
     sf::RenderWindow& window = *getContext().window;
 
+    getContext().player->getCamera().render(window);
     window.draw(*getContext().world);
     window.draw(*getContext().player);
 }

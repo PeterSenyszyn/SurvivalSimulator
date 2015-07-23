@@ -35,6 +35,7 @@ public:
     static sf::Vector2f getResMultiplier() { return m_resMultiplier; }
 
     static sf::Vector2i& getMouseCoords() { return m_mouseCoords; }
+    static sf::Vector2f& getWorldCoords() { return m_worldCoords; }
 
     static void setCurrentResolution(const sf::Vector2u& res) { m_windowCurrentRes = res; }
 
@@ -77,6 +78,7 @@ private:
     static sf::Vector2u m_windowOptimalNativeRes, m_windowCurrentRes;
     static sf::Vector2f m_resMultiplier;
     static sf::Vector2i m_mouseCoords;
+    static sf::Vector2f m_worldCoords;
 };
 
 static float adjustForResX(float val)

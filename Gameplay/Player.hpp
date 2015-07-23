@@ -6,6 +6,7 @@
 #include <Inventory.hpp>
 #include <ExamineMenu.hpp>
 #include <World.hpp>
+#include <Camera.hpp>
 
 #include <SFML/Graphics.hpp>
 
@@ -21,6 +22,7 @@ public:
     static const sf::Vector2f& getPos() { return m_sprite.getPosition(); }
 
     Inventory& getInventory() { return m_inventory; }
+    Camera& getCamera() { return m_camera; }
 
     void addItem(Item::Ptr item);
 
@@ -77,7 +79,7 @@ private:
 
     bool m_isCurrentlyMoving;
 
-    sf::View m_view;
+    Camera m_camera;
 
     TileMap::TileEntityRef::Ptr m_entityRef; //The tile the player currently clicked
 
