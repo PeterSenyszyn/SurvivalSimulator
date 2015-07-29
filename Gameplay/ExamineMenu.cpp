@@ -117,7 +117,7 @@ void ExamineMenu::initActions(Player* player)
     m_actionManager.createAction(0.0, "pickup", "Pick up", [this] { m_window->Show(false); });
 }
 
-void ExamineMenu::Action::update(sfg::ProgressBar::Ptr progressBar, Player* player)
+void Action::update(sfg::ProgressBar::Ptr progressBar, Player* player)
 {
     if ((actionClock.getElapsedTime().asSeconds() / actionTime >= 1.0) || (actionTime == 0.0))
     {

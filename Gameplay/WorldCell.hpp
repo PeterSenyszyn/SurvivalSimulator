@@ -1,12 +1,8 @@
 #pragma once
 
-#include <string>
-#include <list>
-#include <memory>
-#include <map>
-
-#include "TileMap.hpp"
-#include "Item.hpp"
+#include <Utility.hpp>
+#include <TileMap.hpp>
+#include <StorageContainer.hpp>
 
 class WorldCell : public sf::Drawable, public sf::Transformable
 {
@@ -15,7 +11,9 @@ public:
 
     static Ptr create(const std::string& id, bool current);
 
-    void update(sf::Time dt);
+    void handleEvents(const sf::Event& event);
+
+    void update(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keyboardMap);
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
@@ -33,8 +31,15 @@ public:
     static TileMap& getTileMap() { return m_tileMap; }
 
     std::map<std::string, Item::Ptr>& getWorldItems() { return m_worldItems; }
+    std::map<std::string, StorageContainer::Ptr>& getWorldContainers() { return m_storageContainers; }
+
+    const bool hasOpenContainer() const;
+    StorageContainer::Ptr getOpenContainer();
 
     void addWorldItem(Item::Ptr item);
+    void addWorldContainer(StorageContainer::Ptr container);
+
+    bool collidesWithContainer(const sf::FloatRect& rect);
 
 private:
     WorldCell(const std::string& id, bool current);
@@ -45,6 +50,7 @@ private:
     static TileMap m_tileMap;
 
     std::map<std::string, Item::Ptr> m_worldItems;
+    std::map<std::string, StorageContainer::Ptr> m_storageContainers;
 
     bool m_current;
     bool m_update;

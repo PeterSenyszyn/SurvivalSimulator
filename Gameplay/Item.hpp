@@ -4,7 +4,7 @@
 #include <memory>
 
 #include <SFML/Graphics.hpp>
-#include <SFGUI/Widgets.hpp>
+#include <SFGUI/Image.hpp>
 
 class Item : public sf::Drawable
 {

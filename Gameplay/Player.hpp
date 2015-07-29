@@ -2,15 +2,9 @@
 #define PLAYER_H
 
 #include <Entity.hpp>
-#include <Utility.hpp>
 #include <Inventory.hpp>
 #include <ExamineMenu.hpp>
-#include <World.hpp>
 #include <Camera.hpp>
-
-#include <SFML/Graphics.hpp>
-
-#include <Thor/Input.hpp>
 
 class Player : public Entity
 {
@@ -42,7 +36,7 @@ public:
 
 //Event methods that are binded to specific buttons
 public:
-    void onCollectPress(ExamineMenu::ActionManager& actionManager);
+    void onCollectPress(ActionManager& actionManager);
     void onPickupPress(World& world);
 
 private:

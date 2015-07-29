@@ -2,8 +2,7 @@
 
 #include <list>
 
-#include "WorldCell.hpp"
-#include "TileMap.hpp"
+#include <WorldCell.hpp>
 
 class World : public sf::Drawable
 {
@@ -16,7 +15,9 @@ public:
 
     void pushWorldCell(WorldCell::Ptr cell);
 
-    void update(sf::Time dt);
+    void handleEvents(const sf::Event& event);
+
+    void update(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keyboardMap);
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 

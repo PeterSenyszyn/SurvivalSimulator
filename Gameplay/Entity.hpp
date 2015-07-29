@@ -7,9 +7,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include <SFML/Graphics/Drawable.hpp>
-#include <SFML/System/Time.hpp>
-#include <SFML/Window/Event.hpp>
+#include <SFML/Graphics.hpp>
 
 #include <Thor/Animations.hpp>
 

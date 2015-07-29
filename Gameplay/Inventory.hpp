@@ -1,106 +1,44 @@
 #ifndef INVENTORY_H
 #define INVENTORY_H
 
-#include <iostream>
-#include <string>
-
-#include <SFML/Graphics.hpp>
-#include <SFGUI/SFGUI.hpp>
 #include <Thor/Input.hpp>
 
-#include <Utility.hpp>
 #include <WorldCell.hpp>
-#include <Item.hpp>
+#include <RightClickActionManager.hpp>
 
 class Player;
 
-class RightClickAction
+struct Grid
 {
-public:
-    typedef std::shared_ptr<RightClickAction> Ptr;
-
-    static Ptr create(const std::string& id, const std::string& name, std::function<void()> clickedAction)
+    Grid(int pos, Item::Item_Dictionary type, const std::string& name) : pos(pos), numItemsInStack(1), clickedOn(false), type(type), name(name)
     {
-        Ptr temp = Ptr(new RightClickAction(clickedAction));
-        temp->button = sfg::Button::Create(name);
-        temp->button->SetId(id);
-        temp->button->GetSignal(sfg::Widget::OnLeftClick).Connect(clickedAction);
+        itemLabel = sfg::Label::Create(name + "x1");
+    };
 
-        return temp;
-    }
+    int pos;
+    int numItemsInStack;
 
-    bool active;
-    sfg::Button::Ptr button;
+    bool clickedOn;
 
-private:
-    RightClickAction(std::function<void()>& clickedAction) : active(false), clickedAction(clickedAction) {};
+    sfg::Label::Ptr itemLabel;
+    Item::Item_Dictionary type;
 
-    std::function<void()> clickedAction;
+    std::vector<Item::Ptr> items;
+
+    std::string name;
 };
 
-//*********************************************************************************************************************************
-
-class RightClickActionManager
-{
-public:
-    void createRightClickAction(const std::string& id, const std::string& name, std::function<void()> clickedAction)
-    {
-        m_rightClickActions[id] = RightClickAction::create(id, name, clickedAction);
-    }
-
-    void setActiveRightClickAction(const std::string& id)
-    {
-        for (auto& iter : m_rightClickActions)
-            iter.second->active = false;
-
-        getRightClickActionContext(id)->active = true;
-    }
-
-    RightClickAction::Ptr getRightClickActionContext(const std::string& id)
-    {
-        for (auto& iter : m_rightClickActions)
-        {
-            if (iter.first == id)
-                return iter.second;
-        }
-
-        return nullptr;
-    }
-
-private:
-    std::map<std::string, RightClickAction::Ptr> m_rightClickActions;
-};
-
-//*********************************************************************************************************************************
+//*********************************************************************************************************************************//
 
 class Inventory : public sf::Drawable
 {
 public:
     Inventory(Player& playerContext);
 
-    struct Grid
-    {
-        Grid(int pos, Item::Item_Dictionary type, const std::string& name) : pos(pos), numItemsInStack(1), clickedOn(false), type(type), name(name)
-        {
-            itemLabel = sfg::Label::Create(name + "x1");
-        };
-
-        int pos;
-        int numItemsInStack;
-
-        bool clickedOn;
-
-        sfg::Label::Ptr itemLabel;
-        Item::Item_Dictionary type;
-
-        std::vector<Item::Ptr> items;
-
-        std::string name;
-    };
-
     void init();
 
     void addItem(Item::Ptr item);
+    void deleteItem(Item::Ptr item);
 
     void updateInput(thor::ActionMap<Keys::KeyboardInput>& keys);
 
@@ -108,6 +46,14 @@ public:
     void update(sf::Time dt);
 
     sfg::Window::Ptr getWindow() { return m_window; }
+
+    Player& getPlayerContext() { return *playerContext; }
+
+    const void setWorldCellContext(WorldCell& worldCell) { worldCellContext = &worldCell; }
+    WorldCell& getWorldCellContext() { return *worldCellContext; }
+
+    const void setKeyboardMapContext(thor::ActionMap<Keys::KeyboardInput>& context) { keyboardMapContext = &context; }
+    thor::ActionMap<Keys::KeyboardInput>& getKeyboardMapContext() { return *keyboardMapContext; }
 
     const bool getActive() const { return m_active; }
     const void setActive(const bool active) { m_active = active; m_window->Show(active); }
@@ -120,9 +66,11 @@ public:
 
 private:
     void onItemClicked(Item::Item_Dictionary type, int index);
-    void initRightClickActions();
 
-    void actionDropItem(WorldCell::Ptr worldCell);
+    inline void initRightClickActions();
+
+    void actionDropItem();
+    void actionMoveToContainer();
     void actionClose();
 
 private:
@@ -164,13 +112,14 @@ private:
     sfg::ProgressBar::Ptr m_staminaBar;
 
     bool m_active;
-    bool m_needsUpdate;
 
     float m_weight;
 
     std::vector<std::shared_ptr<Grid> > m_grid;
 
     Player* playerContext;
+    WorldCell* worldCellContext;
+    thor::ActionMap<Keys::KeyboardInput>* keyboardMapContext;
 };
 
 #endif // INVENTORY_H

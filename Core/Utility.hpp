@@ -1,9 +1,7 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-//#include <Application.hpp>
-
-#include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/System/Vector2.hpp>
 

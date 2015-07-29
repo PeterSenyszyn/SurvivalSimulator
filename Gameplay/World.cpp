@@ -26,14 +26,26 @@ void World::pushWorldCell(WorldCell::Ptr cell)
     m_worldCells.push_back(cell);
 }
 
-void World::update(sf::Time dt)
+void World::handleEvents(const sf::Event& event)
 {
     if (m_active)
     {
         for (const auto& iter : m_worldCells)
         {
             if (iter->getIfCurrentCell() || iter->getIfUpdate())
-                iter->update(dt);
+                iter->handleEvents(event);
+        }
+    }
+}
+
+void World::update(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keyboardMap)
+{
+    if (m_active)
+    {
+        for (const auto& iter : m_worldCells)
+        {
+            if (iter->getIfCurrentCell() || iter->getIfUpdate())
+                iter->update(dt, keyboardMap);
         }
     }
 }

@@ -1,5 +1,4 @@
 #include <Player.hpp>
-#include <ExamineMenu.hpp>
 #include <Application.hpp>
 
 sf::Sprite Player::m_sprite;
@@ -27,6 +26,7 @@ m_camera(sf::FloatRect({ static_cast<int>(std::floor(adjustForResX(500))), stati
     m_animationSteps.loadFromImage(m_image);
 
     m_sprite.setTexture(m_animationSteps);
+    m_sprite.setScale(1920 / Application::getCurrentResolution().x, 1080 / Application::getCurrentResolution().y);
 
     m_sprite.setPosition(static_cast<int>(std::floor(adjustForResX(500))), static_cast<int>(std::floor(adjustForResY(300))));
 }
@@ -66,7 +66,8 @@ bool Player::nextPosValid(const sf::Vector2f& offset, World& world)
 bool Player::checkCollisions(sf::FloatRect& rect, World& world)
 {
     if (world.getCurrentCell()->getTileMap().collidesWithType(2, rect) ||
-        world.getCurrentCell()->getTileMap().collidesWithType(13, rect))
+        world.getCurrentCell()->getTileMap().collidesWithType(13, rect) ||
+        world.getCurrentCell()->collidesWithContainer(rect))
             return false;
 
     return true;
@@ -81,7 +82,6 @@ void Player::update(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys, Wor
         m_inventory.update(dt);
         m_examineMenu.update(dt, this);
         m_camera.update(dt);
-
     }
 }
 
@@ -204,10 +204,13 @@ void Player::updateInput(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys
                 m_examineMenu.init(m_entityRef, this);
         }
     }
+
+    else if (keys.isActive(Keys::MPRESS))
+        m_inventory.getWorldCellContext().addWorldContainer(StorageContainer::create(20, "Assets/topdown_tiles/chest_closed.png", "Assets/topdown_tiles/chest_open.png", sf::Vector2f(200, 1000), m_inventory));
 }
 
 //Event implementation
-void Player::onCollectPress(ExamineMenu::ActionManager& actionManager)
+void Player::onCollectPress(ActionManager& actionManager)
 {
     if (m_entityRef != nullptr)
     {

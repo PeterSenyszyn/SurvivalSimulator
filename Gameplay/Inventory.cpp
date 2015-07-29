@@ -1,6 +1,7 @@
-#include "Inventory.hpp"
-#include "Application.hpp"
-#include "Player.hpp"
+#include <Inventory.hpp>
+#include <Application.hpp>
+#include <Player.hpp>
+#include <WorldCell.hpp>
 
 #include <cstring>
 
@@ -122,9 +123,6 @@ void Inventory::init()
     sfg::Context::Get().GetEngine().SetProperty(std::string("#statusscroll"), std::string("BackgroundColor"), sf::Color(85, 87, 82, 200));
     sfg::Context::Get().GetEngine().SetProperty(std::string("#statusscroll"), std::string("TitleBackgroundColor"), sf::Color(90, 106, 80, 220));
 
-    //sfg::Context::Get().GetEngine().SetProperty(std::string("#hungerlabel"), std::string("FontSize"), 18);
-    //sfg::Context::Get().GetEngine().SetProperty(std::string("#thirstlabel"), std::string("FontSize"), 18);
-
     m_inventoryScrollBin = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
     m_inventoryScrollBin->Pack(m_table);
     m_inventoryScrollBin->SetId("inventorybin");
@@ -193,6 +191,30 @@ void Inventory::addItem(Item::Ptr item)
 
     sfg::Context::Get().GetEngine().SetProperty(std::string("#Wood"), std::string("FontSize"), adjustForResX(18));
     sfg::Context::Get().GetEngine().SetProperty(std::string("#Berries"), std::string("FontSize"), adjustForResX(18));
+
+    m_desktop.Refresh();
+}
+
+void Inventory::deleteItem(Item::Ptr item)
+{
+    for (int index = 0; index < m_grid.size(); ++index)
+    {
+        if (m_grid[index]->numItemsInStack == 1)
+        {
+            m_grid[index]->items.pop_back();
+            m_table->Remove(m_grid[index]->itemLabel);
+            m_grid.erase(m_grid.begin() + index);
+
+            m_itemClickMenu->Show(false);
+            m_itemClickBox->RemoveAll();
+        }
+
+        else if (m_grid[index]->numItemsInStack > 1)
+        {
+            m_grid[index]->items.pop_back();
+            m_grid[index]->numItemsInStack--;
+        }
+    }
 }
 
 void Inventory::handleEvents(const sf::Event& event)
@@ -274,10 +296,12 @@ void Inventory::onItemClicked(Item::Item_Dictionary type, int index)
 
     m_grid[index]->clickedOn = true;
 
+    m_itemClickBox->Pack(m_rightClickManager.getRightClickActionContext("drop")->button);
+    m_itemClickBox->Pack(m_rightClickManager.getRightClickActionContext("move")->button);
+
     switch (type)
     {
     case Item::Item_Dictionary::WOOD:
-        m_itemClickBox->Pack(m_rightClickManager.getRightClickActionContext("drop")->button);
         m_itemClickMenu->SetTitle("Wood");
         m_itemClickMenu->SetPosition(sf::Vector2f(Application::getMouseCoords().x, Application::getMouseCoords().y - (m_itemClickMenu->GetRequisition().y / 2)));
         m_desktop.BringToFront(m_itemClickMenu);
@@ -290,34 +314,40 @@ void Inventory::onItemClicked(Item::Item_Dictionary type, int index)
 
 void Inventory::initRightClickActions()
 {
-    m_rightClickManager.createRightClickAction("drop", "Drop Item", std::bind(&Inventory::actionDropItem, this, World::getCurrentCell()));
+    m_rightClickManager.createRightClickAction("drop", "Drop Item", std::bind(&Inventory::actionDropItem, this));
+    m_rightClickManager.createRightClickAction("move", "Move to Container", std::bind(&Inventory::actionMoveToContainer, this));
     m_rightClickManager.createRightClickAction("close", "Close", std::bind(&Inventory::actionClose, this));
 }
 
-void Inventory::actionDropItem(WorldCell::Ptr worldCell)
+void Inventory::actionDropItem()
 {
     for (int index = 0; index < m_grid.size(); ++index)
     {
         if (m_grid[index]->clickedOn)
         {
             m_grid[index]->items.back()->getSprite().setPosition(Player::getPos());
+            worldCellContext->addWorldItem(m_grid[index]->items.back());
 
-            if (m_grid[index]->numItemsInStack == 1)
+            deleteItem(m_grid[index]->items.back());
+        }
+    }
+}
+
+void Inventory::actionMoveToContainer()
+{
+    for (int index = 0; index < m_grid.size(); ++index)
+    {
+        if (m_grid[index]->clickedOn)
+        {
+            if (worldCellContext->hasOpenContainer())
             {
-                worldCell->addWorldItem(m_grid[index]->items.back());
-                m_grid[index]->items.pop_back();
-                m_table->Remove(m_grid[index]->itemLabel);
-                m_grid.erase(m_grid.begin() + index);
+                worldCellContext->getOpenContainer()->addItem(m_grid[index]->items.back());
 
+                deleteItem(m_grid[index]->items.back());
             }
 
-            else if (m_grid[index]->numItemsInStack > 1)
-            {
-                worldCell->addWorldItem(m_grid[index]->items.back());
-                m_grid[index]->items.pop_back();
-
-                m_grid[index]->numItemsInStack--;
-            }
+            else
+                std::cout << "No open container currently!" << std::endl;
         }
     }
 }

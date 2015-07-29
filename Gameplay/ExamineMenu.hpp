@@ -1,102 +1,94 @@
 #ifndef EXAMINEMENU_H
 #define EXAMINEMENU_H
 
-#include <map>
-#include <memory>
-
-#include <SFML/Graphics.hpp>
-#include <SFGUI/Widgets.hpp>
-
-#include <TileMap.hpp>
 #include <Item.hpp>
 #include <World.hpp>
 
 class Player;
 
-class ExamineMenu
+struct Action
+{
+    typedef std::shared_ptr<Action> Ptr;
+
+    Action(float actionTime, const std::string& actionName, std::function<void()> finishedMethod) :
+    actionTime(actionTime), actionName(actionName), active(false), finishedMethod(finishedMethod) {};
+
+    static Ptr create(float actionTime, const std::string& id, const std::string& actionName, std::function<void()>& finishedMethod)
+    {
+        Ptr temp = Ptr(new Action(actionTime, actionName, finishedMethod));
+
+        temp->button = sfg::Button::Create(actionName);
+        temp->button->SetId(id);
+
+        return temp;
+    }
+
+    void update(sfg::ProgressBar::Ptr progressBar, Player* player);
+
+    sfg::Button::Ptr button;
+    sf::Clock actionClock;
+    float actionTime;
+
+    bool active;
+    std::string actionName;
+
+    std::function<void()> finishedMethod;
+};
+
+class ActionManager
 {
 public:
-    struct Action
+    void createAction(float actionTime, const std::string& id, const std::string& actionName, std::function<void()> finishedMethod)
     {
-        typedef std::shared_ptr<Action> Ptr;
+        actions[id] = Action::create(actionTime, id, actionName, finishedMethod);
+    }
 
-        Action(float actionTime, const std::string& actionName, std::function<void()> finishedMethod) :
-        actionTime(actionTime), actionName(actionName), active(false), finishedMethod(finishedMethod) {};
-
-        static Ptr create(float actionTime, const std::string& id, const std::string& actionName, std::function<void()>& finishedMethod)
-        {
-            Ptr temp = Ptr(new Action(actionTime, actionName, finishedMethod));
-
-            temp->button = sfg::Button::Create(actionName);
-            temp->button->SetId(id);
-
-            return temp;
-        }
-
-        void update(sfg::ProgressBar::Ptr progressBar, Player* player);
-
-        sfg::Button::Ptr button;
-        sf::Clock actionClock;
-        float actionTime;
-
-        bool active;
-        std::string actionName;
-
-        std::function<void()> finishedMethod;
-    };
-
-    class ActionManager
+    void resetAllGui()
     {
-    public:
-        void createAction(float actionTime, const std::string& id, const std::string& actionName, std::function<void()> finishedMethod)
+        for (const auto& iter : actions)
         {
-            actions[id] = Action::create(actionTime, id, actionName, finishedMethod);
+            if (iter.second->button != nullptr)
+                iter.second->button = sfg::Button::Create(iter.second->actionName);
+
+            else
+                iter.second->button = sfg::Button::Create("Null");
+        }
+    }
+
+    void setActiveAction(const std::string& id)
+    {
+        for (auto& iter : actions)
+            iter.second->active = false;
+
+        getActionContext(id)->active = true;
+    }
+
+    Action::Ptr getActionContext(const std::string& id)
+    {
+        for (auto& iter : actions)
+        {
+            if (iter.first == id)
+                return iter.second;
         }
 
-        void resetAllGui()
+        return nullptr;
+    }
+
+    void update(sfg::ProgressBar::Ptr progressBar, Player* player)
+    {
+        for (auto& iter : actions)
         {
-            for (const auto& iter : actions)
-            {
-                if (iter.second->button != nullptr)
-                    iter.second->button = sfg::Button::Create(iter.second->actionName);
-
-                else
-                    iter.second->button = sfg::Button::Create("Null");
-            }
+            if (iter.second->active)
+                iter.second->update(progressBar, player);
         }
+    }
 
-        void setActiveAction(const std::string& id)
-        {
-            for (auto& iter : actions)
-                iter.second->active = false;
+private:
+    std::map<std::string, Action::Ptr> actions;
+};
 
-            getActionContext(id)->active = true;
-        }
-
-        Action::Ptr getActionContext(const std::string& id)
-        {
-            for (auto& iter : actions)
-            {
-                if (iter.first == id)
-                    return iter.second;
-            }
-
-            return nullptr;
-        }
-
-        void update(sfg::ProgressBar::Ptr progressBar, Player* player)
-        {
-            for (auto& iter : actions)
-            {
-                if (iter.second->active)
-                    iter.second->update(progressBar, player);
-            }
-        }
-
-    private:
-        std::map<std::string, Action::Ptr> actions;
-    };
-
+class ExamineMenu
+{
 public:
     ExamineMenu(Player* player);
 

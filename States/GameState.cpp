@@ -14,7 +14,8 @@ State(stack, context)
 
     initGui();
 
-    //context.window->setView(context.player->getCamera().getView());
+    getContext().player->getInventory().setWorldCellContext(*World::getCurrentCell());
+    getContext().player->getInventory().setKeyboardMapContext(*getContext().keyboardMap);
 }
 
 void GameState::initGui()
@@ -24,6 +25,7 @@ void GameState::initGui()
 
 bool GameState::handleEvent(const sf::Event& event)
 {
+    getContext().world->handleEvents(event);
     getContext().player->handleEvents(event);
 
     if (getContext().keyboardMap->isActive(Keys::ESCAPEPRESS))
@@ -43,7 +45,7 @@ bool GameState::handleEvent(const sf::Event& event)
 
 bool GameState::update(sf::Time dt)
 {
-    getContext().world->update(dt);
+    getContext().world->update(dt, *getContext().keyboardMap);
     getContext().player->update(dt, *getContext().keyboardMap, *getContext().world);
 
     return true;
