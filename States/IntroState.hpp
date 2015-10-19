@@ -1,31 +1,29 @@
-#ifndef INTROSTATE_H
-#define INTROSTATE_H
+#pragma once
 
-#include <State.hpp>
-#include <Application.hpp>
 #include <functional>
+
+#include "State.hpp"
+#include "Application.hpp"
 
 class IntroState : public State
 {
 public:
-    IntroState(StateStack& stack, Context context);
+	IntroState(StateStack& stack, Context context);
 
-    virtual void initGui();
+	virtual void initGui();
 
-    virtual bool update(sf::Time dt);
-    virtual bool handleEvent(const sf::Event& event);
-    virtual void draw();
+	virtual bool update(sf::Time dt);
+	virtual bool handleEvent(const sf::Event& event);
+	virtual void draw();
 
 private:
-    sfg::Window::Ptr mainWindow, loadWindow;
+	sfg::Window::Ptr mainWindow, loadWindow;
 
-    sfg::Box::Ptr mainBox, loadBox;
+	sfg::Box::Ptr mainBox, loadBox;
 
-    sfg::Button::Ptr playButton, settingsButton, creditsButton, exitButton, newGameButton, loadGameButton;
-    sfg::Label::Ptr title;
+	sfg::Button::Ptr playButton, settingsButton, creditsButton, exitButton, newGameButton, loadGameButton;
+	sfg::Label::Ptr title;
 
-    void playButtonClicked();
-    void settingsButtonClicked();
+	void playButtonClicked();
+	void settingsButtonClicked();
 };
-
-#endif // INTROSTATE_H

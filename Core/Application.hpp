@@ -1,94 +1,87 @@
-#ifndef APPLICATION_H
-#define APPLICATION_H
+#pragma once
 
-#include <ResourceHolder.hpp>
-#include <ResourceIdentifiers.hpp>
-#include <StateStack.hpp>
-#include <MusicPlayer.hpp>
-#include <SoundPlayer.hpp>
-#include <GuiManager.hpp>
+#include "ResourceHolder.hpp"
+#include "ResourceIdentifiers.hpp"
+#include "StateStack.hpp"
+#include "MusicPlayer.hpp"
+#include "SoundPlayer.hpp"
+#include "GuiManager.hpp"
 
 #include <SFML/System/Time.hpp>
-
-class MenuStarManager;
 
 class Application
 {
 public:
-    Application();
+	Application();
 
-    void processInput();
-    void update(sf::Time dt);
-    void render();
+	void processInput();
+	void update(sf::Time dt);
+	void render();
 
-    const bool running() { return m_window.isOpen(); }
-    void quit() { m_window.close(); }
+	const bool running() { return m_window.isOpen(); }
+	void quit() { m_window.close(); }
 
-    const bool fpsOn() { return m_fpsOn; }
-    void setFpsOn(bool fpsOn) { m_fpsOn = fpsOn; }
+	const bool fpsOn() { return m_fpsOn; }
+	void setFpsOn(bool fpsOn) { m_fpsOn = fpsOn; }
 
-    static const bool resized() { return m_resized; }
-    static void setResized(bool resized) { m_resized = resized; }
+	static const bool resized() { return m_resized; }
+	static void setResized(bool resized) { m_resized = resized; }
 
-    static sf::Vector2u getOptimalResolution() { return m_windowOptimalNativeRes; }
-    static sf::Vector2u getCurrentResolution() { return m_windowCurrentRes; }
-    static sf::Vector2f getResMultiplier() { return m_resMultiplier; }
+	static sf::Vector2u getOptimalResolution() { return m_windowOptimalNativeRes; }
+	static sf::Vector2u getCurrentResolution() { return m_windowCurrentRes; }
+	static sf::Vector2f getResMultiplier() { return m_resMultiplier; }
 
-    static sf::Vector2i& getMouseCoords() { return m_mouseCoords; }
-    static sf::Vector2f& getWorldCoords() { return m_worldCoords; }
+	static sf::Vector2i& getMouseCoords() { return m_mouseCoords; }
+	static sf::Vector2f& getWorldCoords() { return m_worldCoords; }
 
-    static void setCurrentResolution(const sf::Vector2u& res) { m_windowCurrentRes = res; }
-
-private:
-    void updateFps(sf::Time dt);
-    void registerStates();
-
-    void initKeys();
+	static void setCurrentResolution(const sf::Vector2u& res) { m_windowCurrentRes = res; }
 
 private:
-    sf::RenderWindow m_window;
+	void updateFps(sf::Time dt);
+	void registerStates();
 
-    TextureHolder m_textures;
-    FontHolder m_fonts;
+	void initKeys();
 
-    MusicPlayer m_musicPlayer;
-    SoundPlayer m_soundPlayer;
+private:
+	sf::RenderWindow m_window;
 
-    StateStack m_stateStack;
+	TextureHolder m_textures;
+	FontHolder m_fonts;
 
-    thor::ActionMap<Keys::KeyboardInput> m_keyboardMap;
+	MusicPlayer m_musicPlayer;
+	SoundPlayer m_soundPlayer;
 
-    SettingsParser m_settingsParser;
+	StateStack m_stateStack;
 
-    GuiManager m_guiManager;
+	thor::ActionMap<Keys::KeyboardInput> m_keyboardMap;
 
-    Player m_player;
+	SettingsParser m_settingsParser;
 
-    World m_world;
+	GuiManager m_guiManager;
 
-    static MenuStarManager m_menuStarManager;
+	Player m_player;
 
-    bool m_fpsOn;
-    static bool m_resized;
+	World m_world;
 
-    sf::Text m_fpsText;
-    sf::Clock m_clock;
-    unsigned int m_lastTime;
+	bool m_fpsOn;
+	static bool m_resized;
 
-    static sf::Vector2u m_windowOptimalNativeRes, m_windowCurrentRes;
-    static sf::Vector2f m_resMultiplier;
-    static sf::Vector2i m_mouseCoords;
-    static sf::Vector2f m_worldCoords;
+	sf::Text m_fpsText;
+	sf::Clock m_clock;
+	unsigned int m_lastTime;
+
+	static sf::Vector2u m_windowOptimalNativeRes, m_windowCurrentRes;
+	static sf::Vector2f m_resMultiplier;
+	static sf::Vector2i m_mouseCoords;
+	static sf::Vector2f m_worldCoords;
 };
 
 static float adjustForResX(float val)
 {
-    return val * (static_cast<float>(Application::getCurrentResolution().x) / 1920.f);
+	return val * (static_cast<float>(Application::getCurrentResolution().x) / 1920.f);
 }
 
 static float adjustForResY(float val)
 {
-    return val * (static_cast<float>(Application::getCurrentResolution().y) / 1080.f);
+	return val * (static_cast<float>(Application::getCurrentResolution().y) / 1080.f);
 }
-
-#endif // APPLICATION_H

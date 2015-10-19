@@ -1,84 +1,91 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#pragma once
 
-#include <Entity.hpp>
-#include <Inventory.hpp>
-#include <ExamineMenu.hpp>
-#include <Camera.hpp>
+#include "Entity.hpp"
+#include "Inventory.hpp"
+#include "ExamineMenu.hpp"
+#include "Camera.hpp"
+#include "Console.hpp"
 
 class Player : public Entity
 {
 public:
-    Player();
+	Player(sf::RenderWindow& context);
 
-    void init();
+	void init();
 
-    static const sf::Vector2f& getPos() { return m_sprite.getPosition(); }
+	static const sf::Vector2f& getPos() { return m_sprite.getPosition(); }
 
-    Inventory& getInventory() { return m_inventory; }
-    Camera& getCamera() { return m_camera; }
+	Inventory& getInventory() { return m_inventory; }
+	Camera& getCamera() { return m_camera; }
 
-    void addItem(Item::Ptr item);
+	static Console& getConsole() { return m_console; }
 
-    bool getActive() { return m_active; }
-    void setActive(bool active) { m_active = active; if (!active) m_inventory.setActive(active); }
+	void addItem(Item::Ptr item);
 
-    const float getStamina() const { return m_stamina; }
+	bool getActive() { return m_active; }
+	void setActive(bool active) { m_active = active; if (!active) m_inventory.setActive(active); }
 
-    int checkDistanceTileRef();
+	const float getStamina() const { return m_stamina; }
 
-    void handleEvents(const sf::Event& event);
+	int checkDistanceTileRef();
 
-    virtual bool nextPosValid(const sf::Vector2f& offset, World& world);
+	void handleEvents(const sf::Event& event);
 
-    virtual void update(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys, World& world);
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	virtual bool nextPosValid(const sf::Vector2f& offset, World& world);
 
-//Event methods that are binded to specific buttons
+	virtual void update(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys, World& world);
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+
+	//Event methods that are binded to specific buttons
 public:
-    void onCollectPress(ActionManager& actionManager);
-    void onPickupPress(World& world);
+	void onCollectPress(ActionManager& actionManager);
+	void onPickupPress(World& world);
 
 private:
-    void updateMovement(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys, World& world);
-    void updateInput(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys, World& world);
+	void updateMovement(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys, World& world);
+	void updateInput(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys, World& world);
 
-    bool checkCollisions(sf::FloatRect& rect, World& world);
+	bool checkCollisions(sf::FloatRect& rect, World& world);
 
 private:
-    static sf::Sprite m_sprite;
-    sf::Texture m_animationSteps;
-    sf::Image m_image;
+	static sf::Sprite m_sprite;
+	sf::Texture m_animationSteps;
+	sf::Image m_image;
 
-    Inventory m_inventory;
-    ExamineMenu m_examineMenu;
+	sf::RenderWindow* m_windowContext;
 
-    float m_walkSpeed;
-    float m_sprintSpeed;
+	Inventory m_inventory;
+	ExamineMenu m_examineMenu;
 
-    float m_stamina;
+	static Console m_console;
 
-    float m_requiredStaminaToSprint;
+	float m_walkSpeed;
+	float m_sprintSpeed;
 
-    //Per second
-    float m_baseStaminaDegen;
-    float m_baseStaminaRegen;
+	float m_stamina;
 
-    float m_inventoryWeight;
+	float m_requiredStaminaToSprint;
 
-    bool m_active;
+	sf::Vector2f m_defaultCameraPos;
+	bool m_keepUpdatingCameraX, m_keepUpdatingCameraY;
 
-    bool m_isSprinting;
-    bool m_isWalking;
+	//Per second
+	float m_baseStaminaDegen;
+	float m_baseStaminaRegen;
 
-    bool m_isCurrentlyMoving;
+	float m_inventoryWeight;
 
-    Camera m_camera;
+	bool m_active;
 
-    TileMap::TileEntityRef::Ptr m_entityRef; //The tile the player currently clicked
+	bool m_isSprinting;
+	bool m_isWalking;
 
-    Item::Ptr m_itemRef; //The item the player currently clicked
-    std::string m_itemRefId;
+	bool m_isCurrentlyMoving;
+
+	Camera m_camera;
+
+	TileMap::TileEntityRef::Ptr m_entityRef; //The tile the player currently clicked
+
+	Item::Ptr m_itemRef; //The item the player currently clicked
+	std::string m_itemRefId;
 };
-
-#endif // PLAYER_H

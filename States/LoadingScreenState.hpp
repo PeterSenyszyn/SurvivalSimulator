@@ -1,26 +1,23 @@
-#ifndef LOADINGSCREENSTATE_H
-#define LOADINGSCREENSTATE_H
+#pragma once
 
-#include <State.hpp>
-#include <Application.hpp>
-#include <GameState.hpp>
+#include "State.hpp"
+#include "Application.hpp"
+#include "GameState.hpp"
 
 class LoadingScreenState : public State
 {
 public:
-    LoadingScreenState(StateStack& stack, Context context);
+	LoadingScreenState(StateStack& stack, Context context);
 
-    virtual void initGui();
+	virtual void initGui();
 
-    virtual bool update(sf::Time dt);
-    virtual bool handleEvent(const sf::Event& event);
-    virtual void draw();
+	virtual bool update(sf::Time dt);
+	virtual bool handleEvent(const sf::Event& event);
+	virtual void draw();
 
 private:
-    float m_elapsedTime;
+	float m_elapsedTime;
 
-    sf::Font m_loadingFont;
-    sf::Text m_loadingText;
+	sf::Font m_loadingFont;
+	sf::Text m_loadingText;
 };
-
-#endif // LOADINGSCREENSTATE_H

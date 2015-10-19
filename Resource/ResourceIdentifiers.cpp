@@ -1,4 +1,5 @@
-#pragma once
+#include "stdafx.h"
+#include "ResourceIdentifiers.hpp"
 
 // Forward declaration of SFML classes
 namespace sf

@@ -1,5 +1,4 @@
-#ifndef GUIMANAGER_H
-#define GUIMANAGER_H
+#pragma once
 
 #include <iostream>
 #include <map>
@@ -10,49 +9,47 @@
 #include <SFGUI/Widgets.hpp>
 #include <SFGUI/SFGUI.hpp>
 
-#include <StateIdentifiers.hpp>
-#include <ResourceIdentifiers.hpp>
+#include "StateIdentifiers.hpp"
+#include "ResourceIdentifiers.hpp"
 
 class GuiManager
 {
 public:
-    GuiManager();
+	GuiManager();
 
-    void update(sf::Time dt);
-    void handleEvents(const sf::Event& event);
-    void draw(sf::RenderWindow& window);
+	void update(sf::Time dt);
+	void handleEvents(const sf::Event& event);
+	void draw(sf::RenderWindow& window);
 
-    static std::shared_ptr<sfg::Window> createWindow(States::ID stateID, const std::string& id, std::uint8_t style);
-    static std::shared_ptr<sfg::Window> getWindow(States::ID stateID, const std::string& id);
+	static std::shared_ptr<sfg::Window> createWindow(States::ID stateID, const std::string& id, std::uint8_t style);
+	static std::shared_ptr<sfg::Window> getWindow(States::ID stateID, const std::string& id);
 
-    static void resetWindows();
+	static void resetWindows();
 
-    template <class T>
-    void setDesktopProperty(std::string selector, std::string property, const T& value) { m_desktop.SetProperty(selector, property, value); }
+	template <class T>
+	void setDesktopProperty(std::string selector, std::string property, const T& value) { m_desktop.SetProperty(selector, property, value); }
 
-    void setStateWindowsShow(States::ID stateID, bool show);
-    void hideAllWindows();
+	void setStateWindowsShow(States::ID stateID, bool show);
+	void hideAllWindows();
 
-    struct StateGuiContext
-    {
-        typedef std::shared_ptr<StateGuiContext> Ptr;
+	struct StateGuiContext
+	{
+		typedef std::shared_ptr<StateGuiContext> Ptr;
 
-        std::map<std::string, std::shared_ptr<sfg::Window> > windows;
-    };
-
-private:
-    void createGuiContext(States::ID stateID);
+		std::map<std::string, std::shared_ptr<sfg::Window> > windows;
+	};
 
 private:
-    sfg::SFGUI m_sfgui;
-    static sfg::Desktop m_desktop;
-
-    std::shared_ptr<sf::Font> m_globalFont;
-
-    std::string m_globalFontPath;
+	void createGuiContext(States::ID stateID);
 
 private:
-    static std::map<States::ID, StateGuiContext::Ptr> m_stateGuiContexts;
+	sfg::SFGUI m_sfgui;
+	static sfg::Desktop m_desktop;
+
+	std::shared_ptr<sf::Font> m_globalFont;
+
+	std::string m_globalFontPath;
+
+private:
+	static std::map<States::ID, StateGuiContext::Ptr> m_stateGuiContexts;
 };
-
-#endif // GUIMANAGER_H

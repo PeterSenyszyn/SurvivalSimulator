@@ -1,9 +1,8 @@
-#ifndef STORAGECONTAINER_H
-#define STORAGECONTAINER_H
+#pragma once
 
-#include <Utility.hpp>
-#include <RightClickActionManager.hpp>
-#include <Item.hpp>
+#include "Utility.hpp"
+#include "RightClickActionManager.hpp"
+#include "Item.hpp"
 
 class Inventory;
 struct Grid;
@@ -11,61 +10,61 @@ struct Grid;
 class StorageContainer : public sf::Drawable
 {
 public:
-    typedef std::shared_ptr<StorageContainer> Ptr;
+	typedef std::shared_ptr<StorageContainer> Ptr;
 
-    static Ptr create(unsigned int storageSpace, const std::string& closedPath, const std::string& openedPath, sf::Vector2f pos, Inventory& context)
-    { return Ptr(new StorageContainer(storageSpace, closedPath, openedPath, pos, context)); }
+	static Ptr create(unsigned int storageSpace, const std::string& closedPath, const std::string& openedPath, sf::Vector2f pos, Inventory& context)
+	{
+		return Ptr(new StorageContainer(storageSpace, closedPath, openedPath, pos, context));
+	}
 
-    const bool menuOpened() const { return m_menuOpened; }
+	const bool menuOpened() const { return m_menuOpened; }
 
-    const sf::Sprite& getSprite() { return m_sprite; }
+	const sf::Sprite& getSprite() { return m_sprite; }
 
-    void addItem(Item::Ptr item);
-    void deleteItem(Item::Ptr);
-    void takeItem();
+	void addItem(Item::Ptr item);
+	void deleteItem(Item::Ptr);
+	void takeItem();
 
-    void initRightClickActions();
+	void initRightClickActions();
 
-    void close();
+	void close();
 
-    void handleEvents(const sf::Event& event);
+	void handleEvents(const sf::Event& event);
 
-    void update(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keyboardMap);
+	void update(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keyboardMap);
 
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-
-private:
-    void onItemClicked(Item::Item_Dictionary type, int index);
-
-    int checkDist(const sf::Vector2f& vec);
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 private:
-    StorageContainer(unsigned int storageSpace, const std::string& closedPath, const std::string& openedPath, sf::Vector2f pos, Inventory& context);
+	void onItemClicked(Item::Item_Dictionary type, int index);
 
-    unsigned int m_storageSpace;
+	int checkDist(const sf::Vector2f& vec);
 
-    bool m_isClosed;
+private:
+	StorageContainer(unsigned int storageSpace, const std::string& closedPath, const std::string& openedPath, sf::Vector2f pos, Inventory& context);
 
-    bool m_menuOpened;
+	unsigned int m_storageSpace;
 
-    Inventory* m_context;
+	bool m_isClosed;
 
-    RightClickActionManager m_rightClickManager;
+	bool m_menuOpened;
 
-    std::vector<std::shared_ptr<Grid> > m_grid;
+	Inventory* m_context;
 
-    sf::Texture m_closed, m_open;
-    sf::Sprite m_sprite;
+	RightClickActionManager m_rightClickManager;
 
-    std::shared_ptr<sf::Font> m_font;
-    sfg::Desktop m_desktop;
+	std::vector<std::shared_ptr<Grid> > m_grid;
 
-    sfg::Window::Ptr m_window, m_itemClickMenu;
-    sfg::ScrolledWindow::Ptr m_storageScrollWindow;
+	sf::Texture m_closed, m_open;
+	sf::Sprite m_sprite;
 
-    sfg::Table::Ptr m_table;
+	std::shared_ptr<sf::Font> m_font;
+	sfg::Desktop m_desktop;
 
-    sfg::Box::Ptr m_itemClickBox, m_storageBin;
+	sfg::Window::Ptr m_window, m_itemClickMenu;
+	sfg::ScrolledWindow::Ptr m_storageScrollWindow;
+
+	sfg::Table::Ptr m_table;
+
+	sfg::Box::Ptr m_itemClickBox, m_storageBin;
 };
-
-#endif // STORAGECONTAINER_H

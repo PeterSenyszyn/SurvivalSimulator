@@ -1,5 +1,4 @@
-#ifndef UTILITY_H
-#define UTILITY_H
+#pragma once
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -13,13 +12,13 @@
 
 namespace sf
 {
-    class Sprite;
-    class Text;
+	class Sprite;
+	class Text;
 }
 
 namespace Keys
 {
-    enum KeyboardInput
+	enum KeyboardInput
 	{
 		//Keyboard user input
 		UNKNOWN,
@@ -157,5 +156,3 @@ int randomInt(int minNum, int maxNum);
 //Vector operations
 float length(sf::Vector2f vector);
 sf::Vector2f unitVector(sf::Vector2f vector);
-
-#endif // UTILITY_H

@@ -1,29 +1,26 @@
-#ifndef NEWGAMESTATE_H
-#define NEWGAMESTATE_H
+#pragma once
 
-#include <State.hpp>
+#include "State.hpp"
 
 class NewGameState : public State
 {
 public:
-    NewGameState(StateStack& stack, Context context);
+	NewGameState(StateStack& stack, Context context);
 
-    virtual void initGui();
+	virtual void initGui();
 
-    bool handleEvent(const sf::Event& event);
-    bool update(sf::Time dt);
-    virtual void draw();
+	bool handleEvent(const sf::Event& event);
+	bool update(sf::Time dt);
+	virtual void draw();
 
 private:
-    sfg::Label::Ptr nameLabel;
-    sfg::Entry::Ptr nameEntry;
+	sfg::Label::Ptr nameLabel;
+	sfg::Entry::Ptr nameEntry;
 
-    sfg::ComboBox::Ptr genderBox;
+	sfg::ComboBox::Ptr genderBox;
 
-    sfg::Label::Ptr difficultyLabel;
-    sfg::ComboBox::Ptr difficultyBox;
+	sfg::Label::Ptr difficultyLabel;
+	sfg::ComboBox::Ptr difficultyBox;
 
-    sfg::Button::Ptr goButton;
+	sfg::Button::Ptr goButton;
 };
-
-#endif // NEWGAMESTATE_H

@@ -1,5 +1,4 @@
-#ifndef TILEMAP_H
-#define TILEMAP_H
+#pragma once
 
 #include <vector>
 #include <memory>
@@ -11,80 +10,83 @@
 class TileMap : public sf::Drawable, public sf::Transformable
 {
 public:
-    struct Tile
-    {
-        Tile(const sf::FloatRect& bounds, const sf::Vector2f pos, int tileType) : bounds(bounds), pos(pos), tileType(tileType) {};
+	struct Tile
+	{
+		Tile(const sf::FloatRect& bounds, const sf::Vector2f pos, int tileType) : bounds(bounds), pos(pos), tileType(tileType) {};
 
-        sf::FloatRect bounds;
-        sf::Vector2f pos;
-        int tileType;
-    };
+		sf::FloatRect bounds;
+		sf::Vector2f pos;
+		int tileType;
+	};
 
-    struct TileEntityRef
-    {
-        typedef std::shared_ptr<TileEntityRef> Ptr;
+	struct TileEntityRef
+	{
+		typedef std::shared_ptr<TileEntityRef> Ptr;
 
-        TileEntityRef(int tileType, const std::string& tileName, bool pickUppable, bool collectable) :
-        tileType(tileType), tileName(tileName), pickUppable(pickUppable), collectable(collectable) {};
+		TileEntityRef(int tileType, const std::string& tileName, bool pickUppable, bool collectable) :
+			tileType(tileType), tileName(tileName), pickUppable(pickUppable), collectable(collectable) {};
 
-        int tileType;
-        sf::Vector2f pos;
-        std::string tileName;
+		int tileType;
+		sf::Vector2f pos;
+		std::string tileName;
 
-        bool pickUppable;
-        bool collectable;
-    };
+		bool pickUppable;
+		bool collectable;
+	};
 
 public:
-    TileMap();
+	TileMap();
 
-    const bool getActive() const { return m_active; }
-    const void setActive(const bool active) { m_active = active; }
+	const bool getActive() const { return m_active; }
+	const void setActive(const bool active) { m_active = active; }
 
-    bool load(const std::string& filepath, sf::Vector2u tileSize, const int* tiles, unsigned width, unsigned int height);
+	static const unsigned int getSizeX() { return m_xSize; }
+	static const unsigned int getSizeY() { return m_ySize; }
 
-    bool collidesWithType(int tileType, const sf::FloatRect& bounds)
-    {
-        for (auto& iter : m_tiles)
-        {
-            if (iter.tileType == tileType)
-            {
-                if (bounds.intersects(iter.bounds))
-                    return true;
-            }
-        }
+	bool load(const std::string& filepath, sf::Vector2u tileSize, const int* tiles, unsigned int width, unsigned int height);
 
-        return false;
-    }
+	bool collidesWithType(int tileType, const sf::FloatRect& bounds)
+	{
+		for (auto& iter : m_tiles)
+		{
+			if (iter.tileType == tileType)
+			{
+				if (bounds.intersects(iter.bounds))
+					return true;
+			}
+		}
 
-    TileEntityRef::Ptr getTileMouseOver(sf::Vector2f& mouseCoords)
-    {
-        for (auto& iter : m_tiles)
-        {
-            for (auto& iter2 : m_tileEntityRef)
-            {
-                if (iter.tileType == iter2->tileType && iter.bounds.contains(mouseCoords.x, mouseCoords.y))
-                {
-                    iter2->pos = iter.pos;
+		return false;
+	}
 
-                    return iter2;
-                }
-            }
-        }
+	TileEntityRef::Ptr getTileMouseOver(sf::Vector2f& mouseCoords)
+	{
+		for (auto& iter : m_tiles)
+		{
+			for (auto& iter2 : m_tileEntityRef)
+			{
+				if (iter.tileType == iter2->tileType && iter.bounds.contains(mouseCoords.x, mouseCoords.y))
+				{
+					iter2->pos = iter.pos;
 
-        return nullptr;
-    }
+					return iter2;
+				}
+			}
+		}
+
+		return nullptr;
+	}
 
 private:
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
-    bool m_active;
+	bool m_active;
 
-    sf::VertexArray m_vertices;
-    sf::Texture m_tileset;
+	static unsigned int m_xSize, m_ySize;
 
-    std::vector<Tile> m_tiles;
-    std::vector<TileEntityRef::Ptr> m_tileEntityRef;
+	sf::VertexArray m_vertices;
+	sf::Texture m_tileset;
+
+	std::vector<Tile> m_tiles;
+	std::vector<TileEntityRef::Ptr> m_tileEntityRef;
 };
-
-#endif // TILEMAP_H

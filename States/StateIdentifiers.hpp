@@ -1,17 +1,14 @@
-#ifndef STATEIDENTIFIERS_H
-#define STATEIDENTIFIERS_H
+#pragma once
 
 namespace States
 {
-    enum ID
-    {
-        None,
-        Intro,
-        Settings,
-        NewGame,
-        Game,
-        Loading,
-    };
+	enum ID
+	{
+		None,
+		Intro,
+		Settings,
+		NewGame,
+		Game,
+		Loading,
+	};
 }
-
-#endif // STATEIDENTIFIERS_H
