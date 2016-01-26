@@ -24,7 +24,7 @@ m_devMode(devMode)
 	m_table = sfg::Table::Create();
 	m_table->SetRowSpacings(adjustForResX(5.f));
 	m_table->SetColumnSpacings(adjustForResY(5.f));
-	m_table->SetRequisition(sf::Vector2f(adjustForResX(375), adjustForResX(375)));
+	m_table->SetRequisition(sf::Vector2f(adjustForResX(325), adjustForResY(325)));
 
 	sfg::Context::Get().GetEngine().SetProperty(std::string("#consolemenu"), std::string("BackgroundColor"), sf::Color(85, 87, 82, 200));
 	sfg::Context::Get().GetEngine().SetProperty(std::string("#consolemenu"), std::string("TitleBackgroundColor"), sf::Color(90, 106, 80, 220));
@@ -39,6 +39,12 @@ m_devMode(devMode)
 	sfg::Context::Get().GetEngine().SetProperty(std::string("#consolebin"), std::string("BackgroundColor"), sf::Color(85, 87, 82, 200));
 	sfg::Context::Get().GetEngine().SetProperty(std::string("#consolebin"), std::string("TitleBackgroundColor"), sf::Color(90, 106, 80, 220));
 
+	m_guiMessage = sfg::Label::Create("");
+	m_guiMessage->SetId("guiMessageLabel");
+	sfg::Context::Get().GetEngine().SetProperty("#guiMessageLabel", std::string("FontSize"), adjustForResX(16.f));
+
+	m_table->Attach(m_guiMessage, sf::Rect<sf::Uint32>(0, 0, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(10.f, 10.f));
+
 	m_scrollMenu->AddWithViewport(m_consoleScrollBin);
 
 	m_window->Add(m_scrollMenu);
@@ -46,8 +52,6 @@ m_devMode(devMode)
 	m_desktop.Add(m_window);
 
 	setActive(false);
-
-	sendMessage("testasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasd", false);
 }
 
 void Console::update(sf::Time dt)
@@ -60,26 +64,28 @@ void Console::handleEvents(const sf::Event& event)
 	m_desktop.HandleEvent(event);
 }
 
-void Console::sendMessage(const std::string& message, bool devOnly)
+void Console::sendMessage(const std::string& message)
 {
 	std::string formattedMessage = message;
 
-	formattedMessage.insert(0, "-");
+	formattedMessage.insert(0, "[Game] ");
 
-	for (int i = 0; i < formattedMessage.length(); i++)
+	int numCharsBeforeSpace = 39;
+	int timeSinceLastSpace = 0;
+
+	for (int i = 0; i < formattedMessage.size(); i++)
 	{
-		if ((i * 16) >= 375 || (i * 16) % 375 == 0)
+		if (timeSinceLastSpace == numCharsBeforeSpace)
+		{
 			formattedMessage.insert(i, "\n");
+
+			timeSinceLastSpace = -1;
+		}
+
+		timeSinceLastSpace++;
 	}
 
-	std::cout << formattedMessage << std::endl;
+	formattedMessage += "\n";
 
-	m_messages[formattedMessage] = devOnly;
-
-	m_texts.push_back(sfg::Label::Create(formattedMessage));
-	m_texts.back()->SetId("text" + std::to_string(m_texts.size()));
-
-	sfg::Context::Get().GetEngine().SetProperty(std::string("#text" + std::to_string(m_texts.size())), std::string("FontSize"), adjustForResX(16.f));
-
-	m_table->Add(m_texts.back());
+	m_guiMessage->SetText(m_guiMessage->GetText() + formattedMessage);
 }

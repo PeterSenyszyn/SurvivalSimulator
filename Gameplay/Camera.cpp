@@ -16,13 +16,15 @@ m_playerMappedCoords(0, 0)
 
 void Camera::update(sf::Time dt)
 {
-
+	
 }
 
 void Camera::render(sf::RenderWindow& window)
 {
 	topLeft = window.mapPixelToCoords(sf::Vector2i(0, 0));
-	bottomRight = window.mapPixelToCoords(sf::Vector2i(window.getSize()));	
+	bottomRight = window.mapPixelToCoords(sf::Vector2i(Application::getCurrentResolution()));	
+
+	m_view.setSize(adjustForResX(Application::getCurrentResolution().x), adjustForResY(Application::getCurrentResolution().y));
 
 	setPlayerMappedCoords(window.mapCoordsToPixel(m_spriteToFollow->getPosition()));
 }

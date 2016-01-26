@@ -15,9 +15,6 @@ GameState::GameState(StateStack& stack, Context context) :
 	context.world->setActive(true);
 
 	initGui();
-
-	getContext().player->getInventory().setWorldCellContext(*World::getCurrentCell());
-	getContext().player->getInventory().setKeyboardMapContext(*getContext().keyboardMap);
 }
 
 void GameState::initGui()

@@ -1,13 +1,11 @@
 #pragma once
 
-#include "WorldCell.hpp"
 #include "RightClickActionManager.hpp"
-
-class Player;
+#include "ItemManager.hpp"
 
 struct Grid
 {
-	Grid(int pos, Item::Item_Dictionary type, const std::string& name) : pos(pos), numItemsInStack(1), clickedOn(false), type(type), name(name)
+	Grid(int pos, ItemManager::Item::Item_Dictionary type, const std::string& name) : pos(pos), numItemsInStack(1), clickedOn(false), type(type), name(name)
 	{
 		itemLabel = sfg::Label::Create(name + "x1");
 	};
@@ -18,49 +16,33 @@ struct Grid
 	bool clickedOn;
 
 	sfg::Label::Ptr itemLabel;
-	Item::Item_Dictionary type;
+	ItemManager::Item::Item_Dictionary type;
 
-	std::vector<Item::Ptr> items;
+	std::vector<ItemManager::Item::Ptr> items;
 
-	std::string name;
+	std::string name; //Example: Wood, Berry
 };
 
-//*********************************************************************************************************************************//
-
-class Inventory : public sf::Drawable
+class Inventory
 {
 public:
-	Inventory(Player& playerContext);
-
 	void init();
 
-	void addItem(Item::Ptr item);
-	void deleteItem(Item::Ptr item);
+	void addItem(ItemManager::Item::Ptr item);
+	void deleteItem(ItemManager::Item::Ptr item);
 
 	void handleEvents(const sf::Event& event);
 	void update(sf::Time dt);
 
+	void updatePlayerInfo(float health, float thirst, float encumbrance, float stamina);
+
 	sfg::Window::Ptr getWindow() { return m_window; }
-
-	Player& getPlayerContext() { return *playerContext; }
-
-	const void setWorldCellContext(WorldCell& worldCell) { worldCellContext = &worldCell; }
-	WorldCell& getWorldCellContext() { return *worldCellContext; }
-
-	const void setKeyboardMapContext(thor::ActionMap<Keys::KeyboardInput>& context) { keyboardMapContext = &context; }
-	thor::ActionMap<Keys::KeyboardInput>& getKeyboardMapContext() { return *keyboardMapContext; }
 
 	const bool getActive() const { return m_active; }
 	const void setActive(const bool active) { m_active = active; m_window->Show(active); }
 
-	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-
-	void setHealthPercentage(float percent) { m_healthBar->SetFraction(percent); }
-	void setHungerPercentage(float percent) { m_hungerBar->SetFraction(percent); }
-	void setThirstPercentage(float percent) { m_thirstBar->SetFraction(percent); }
-
 private:
-	void onItemClicked(Item::Item_Dictionary type, int index);
+	void onItemClicked(const std::string& itemName, int index);
 
 	inline void initRightClickActions();
 
@@ -69,8 +51,6 @@ private:
 	void actionClose();
 
 private:
-	RightClickActionManager m_rightClickManager;
-
 	sfg::Desktop m_desktop;
 	std::shared_ptr<sf::Font> m_font;
 
@@ -106,13 +86,10 @@ private:
 	sfg::Label::Ptr m_staminaLabel;
 	sfg::ProgressBar::Ptr m_staminaBar;
 
+private:
+	RightClickActionManager m_rightClickManager;
+
 	bool m_active;
 
-	float m_weight;
-
 	std::vector<std::shared_ptr<Grid> > m_grid;
-
-	Player* playerContext;
-	WorldCell* worldCellContext;
-	thor::ActionMap<Keys::KeyboardInput>* keyboardMapContext;
 };

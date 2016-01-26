@@ -1,22 +1,11 @@
 #include "stdafx.h"
+
 #include "Inventory.hpp"
-
 #include "Application.hpp"
-#include "Player.hpp"
-#include "WorldCell.hpp"
-
-#include <cstring>
-
-Inventory::Inventory(Player& playerContext) :
-	playerContext(&playerContext)
-{
-
-}
+#include "World.hpp"
 
 void Inventory::init()
 {
-	m_weight = 0.0;
-
 	m_font = std::make_shared<sf::Font>();
 	m_font->loadFromFile("Assets/font.ttf");
 
@@ -156,7 +145,7 @@ void Inventory::init()
 	initRightClickActions();
 }
 
-void Inventory::addItem(Item::Ptr item)
+void Inventory::addItem(ItemManager::Item::Ptr item)
 {
 	bool itemExists = false;
 
@@ -180,41 +169,40 @@ void Inventory::addItem(Item::Ptr item)
 
 	else if (!itemExists || !item->isStackable())
 	{
-		m_grid.push_back(std::shared_ptr<Grid>(new Grid(m_grid.size() - 1, item->getItemId(), item->getName())));
+		m_grid.push_back(std::make_shared<Grid>(m_grid.size() - 1, item->getItemId(), item->getName()));
 
-		m_grid[m_grid.size() - 1]->items.push_back(item);
-		m_grid[m_grid.size() - 1]->itemLabel->GetSignal(sfg::Widget::OnRightClick).Connect(std::bind(&Inventory::onItemClicked, this, m_grid[m_grid.size() - 1]->type, m_grid.size() - 1));
-		m_grid[m_grid.size() - 1]->itemLabel->SetRequisition(sf::Vector2f(adjustForResX(200), adjustForResY(200)));
-		m_grid[m_grid.size() - 1]->itemLabel->SetId(item->getName());
-		m_table->Attach(m_grid[m_grid.size() - 1]->itemLabel, sf::Rect<sf::Uint32>(m_grid.size() - 1, m_grid.size() - 1, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(adjustForResX(10.f), adjustForResY(10.f)));
+		m_grid.back()->items.push_back(item);
+		m_grid.back()->itemLabel->GetSignal(sfg::Widget::OnRightClick).Connect(std::bind(&Inventory::onItemClicked, this, m_grid.back()->name, m_grid.size() - 1));
+		m_grid.back()->itemLabel->SetRequisition(sf::Vector2f(adjustForResX(200), adjustForResY(200)));
+		m_grid.back()->itemLabel->SetId(item->getName());
+		
+		m_table->Attach(m_grid.back()->itemLabel, sf::Rect<sf::Uint32>(m_grid.size() - 1, m_grid.size() - 1, 1, 1), sfg::Table::FILL, sfg::Table::FILL, sf::Vector2f(adjustForResX(10.f), adjustForResY(10.f)));
 	}
 
-	m_weight += static_cast<int>(item->getItemId());
+	//sfg::Context::Get().GetEngine().SetProperty(std::string("#Wood"), std::string("FontSize"), adjustForResX(18));
+	//sfg::Context::Get().GetEngine().SetProperty(std::string("#Berries"), std::string("FontSize"), adjustForResX(18));
 
-	sfg::Context::Get().GetEngine().SetProperty(std::string("#Wood"), std::string("FontSize"), adjustForResX(18));
-	sfg::Context::Get().GetEngine().SetProperty(std::string("#Berries"), std::string("FontSize"), adjustForResX(18));
-
-	m_desktop.Refresh();
+	Player::getConsole().sendMessage(m_grid.back()->items.back()->getName() + " was added to your inventory.");
 }
 
-void Inventory::deleteItem(Item::Ptr item)
+void Inventory::deleteItem(ItemManager::Item::Ptr item)
 {
-	for (int index = 0; index < m_grid.size(); ++index)
+	for (int i = 0; i < m_grid.size(); i++)
 	{
-		if (m_grid[index]->numItemsInStack == 1)
+		if (m_grid[i]->numItemsInStack == 1)
 		{
-			m_grid[index]->items.pop_back();
-			m_table->Remove(m_grid[index]->itemLabel);
-			m_grid.erase(m_grid.begin() + index);
+			m_grid[i]->items.pop_back();
+			m_table->Remove(m_grid[i]->itemLabel);
+			m_grid.erase(m_grid.begin() + i);
 
-			m_itemClickMenu->Show(false);
+			m_itemClickMenu->Show(true);
 			m_itemClickBox->RemoveAll();
 		}
 
-		else if (m_grid[index]->numItemsInStack > 1)
+		else if (m_grid[i]->numItemsInStack > 1)
 		{
-			m_grid[index]->items.pop_back();
-			m_grid[index]->numItemsInStack--;
+			m_grid[i]->items.pop_back();
+			m_grid[i]->numItemsInStack--;
 		}
 	}
 }
@@ -224,75 +212,23 @@ void Inventory::handleEvents(const sf::Event& event)
 	m_desktop.HandleEvent(event);
 }
 
+void Inventory::updatePlayerInfo(float health, float thirst, float encumbrance, float stamina)
+{
+	m_healthBar->SetFraction(health / 100.f);
+	m_thirstBar->SetFraction(thirst / 100.f);
+	m_encumbranceBar->SetFraction(encumbrance / 100.f);
+	m_staminaBar->SetFraction(stamina / 100.f);
+}
+
 void Inventory::update(sf::Time dt)
 {
-	m_staminaBar->SetFraction(playerContext->getStamina() / 100);
-
 	m_desktop.Update(dt.asSeconds());
 
 	for (const auto& iter : m_grid)
 		iter->itemLabel->SetText(iter->name + " x" + std::to_string(iter->numItemsInStack));
-
-	//Over the comfortable amount, start decreasing health and energy
-	static float weightTotalTime = 0.0;
-
-	//If weight over 90, decrease health by 1 every 5 seconds, and energy (to be decided)
-	if (m_weight > 90 && m_weight < 130)
-	{
-		weightTotalTime += dt.asSeconds();
-
-		if (weightTotalTime > 5.0)
-		{
-			m_healthBar->SetFraction(m_healthBar->GetFraction() - 0.01);
-
-			weightTotalTime = 0.0;
-		}
-	}
-
-	//If weight over 130, decrease health by 1 every 2.5 seconds. and energy (tbd)
-	else if (m_weight > 130 && m_weight < 160)
-	{
-		weightTotalTime += dt.asSeconds();
-
-		if (weightTotalTime > 2.5)
-		{
-			m_healthBar->SetFraction(m_healthBar->GetFraction() - 0.01);
-
-			weightTotalTime = 0.0;
-		}
-	}
-
-	else if (m_weight > 160 && m_weight < 200)
-	{
-		weightTotalTime += dt.asSeconds();
-
-		if (weightTotalTime > 1)
-		{
-			m_healthBar->SetFraction(m_healthBar->GetFraction() - 0.01);
-
-			weightTotalTime = 0.0;
-		}
-	}
-
-	else if (m_weight >= 200)
-	{
-		weightTotalTime += dt.asSeconds();
-
-		if (weightTotalTime > 0.25 / m_weight * 200)
-		{
-			m_healthBar->SetFraction(m_healthBar->GetFraction() - 0.01);
-
-			weightTotalTime = 0.0;
-		}
-	}
 }
 
-void Inventory::draw(sf::RenderTarget& target, sf::RenderStates states) const
-{
-
-}
-
-void Inventory::onItemClicked(Item::Item_Dictionary type, int index)
+void Inventory::onItemClicked(const std::string& name, int index)
 {
 	m_itemClickMenu->Show(true);
 
@@ -301,15 +237,9 @@ void Inventory::onItemClicked(Item::Item_Dictionary type, int index)
 	m_itemClickBox->Pack(m_rightClickManager.getRightClickActionContext("drop")->button);
 	m_itemClickBox->Pack(m_rightClickManager.getRightClickActionContext("move")->button);
 
-	switch (type)
-	{
-	case Item::Item_Dictionary::WOOD:
-		m_itemClickMenu->SetTitle("Wood");
-		m_itemClickMenu->SetPosition(sf::Vector2f(Application::getMouseCoords().x, Application::getMouseCoords().y - (m_itemClickMenu->GetRequisition().y / 2)));
-		m_desktop.BringToFront(m_itemClickMenu);
-
-		break;
-	}
+	m_itemClickMenu->SetTitle(name);
+	m_itemClickMenu->SetPosition(sf::Vector2f(Application::getMouseCoords().x, Application::getMouseCoords().y - (m_itemClickMenu->GetRequisition().y / 2)));
+	m_desktop.BringToFront(m_itemClickMenu);
 
 	m_itemClickBox->Pack(m_rightClickManager.getRightClickActionContext("close")->button);
 }
@@ -323,33 +253,37 @@ void Inventory::initRightClickActions()
 
 void Inventory::actionDropItem()
 {
-	for (int index = 0; index < m_grid.size(); ++index)
+	for (const auto& iter : m_grid)
 	{
-		if (m_grid[index]->clickedOn)
+		if (iter->clickedOn)
 		{
-			m_grid[index]->items.back()->getSprite().setPosition(Player::getPos());
-			worldCellContext->addWorldItem(m_grid[index]->items.back());
+			iter->items.back()->getSprite().setPosition(Player::getPos());
+			World::getCurrentCell()->addWorldItem(iter->items.back());
 
-			deleteItem(m_grid[index]->items.back());
+			Player::getConsole().sendMessage("You dropped a(n) " + iter->items.back()->getName());
+
+			deleteItem(iter->items.back());
 		}
 	}
 }
 
 void Inventory::actionMoveToContainer()
 {
-	for (int index = 0; index < m_grid.size(); ++index)
+	for (const auto& iter : m_grid)
 	{
-		if (m_grid[index]->clickedOn)
+		if (iter->clickedOn)
 		{
-			if (worldCellContext->hasOpenContainer())
+			if (World::getCurrentCell()->hasOpenContainer())
 			{
-				worldCellContext->getOpenContainer()->addItem(m_grid[index]->items.back());
+				World::getCurrentCell()->getOpenContainer()->addItem(iter->items.back());
 
-				deleteItem(m_grid[index]->items.back());
+				Player::getConsole().sendMessage("You moved a(n) " + iter->items.back()->getName() + " to the container.");
+
+				deleteItem(iter->items.back());
 			}
 
 			else
-				std::cout << "No open container currently!" << std::endl;
+				Player::getConsole().sendMessage("You can't transfer items without an open container!");
 		}
 	}
 }

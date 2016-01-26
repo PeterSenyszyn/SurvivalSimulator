@@ -74,7 +74,7 @@ StorageContainer::StorageContainer(unsigned int storageSpace, const std::string&
 	initRightClickActions();
 }
 
-void StorageContainer::addItem(Item::Ptr item)
+void StorageContainer::addItem(ItemManager::Item::Ptr item)
 {
 	bool itemExists = false;
 
@@ -111,7 +111,7 @@ void StorageContainer::addItem(Item::Ptr item)
 	sfg::Context::Get().GetEngine().SetProperty(std::string("#Berries"), std::string("FontSize"), adjustForResX(18));
 }
 
-void StorageContainer::deleteItem(Item::Ptr item)
+void StorageContainer::deleteItem(ItemManager::Item::Ptr item)
 {
 	for (int index = 0; index < m_grid.size(); ++index)
 	{
@@ -145,7 +145,7 @@ void StorageContainer::takeItem()
 	}
 }
 
-void StorageContainer::onItemClicked(Item::Item_Dictionary type, int index)
+void StorageContainer::onItemClicked(ItemManager::Item::Item_Dictionary type, int index)
 {
 	m_itemClickMenu->Show(true);
 
@@ -155,7 +155,7 @@ void StorageContainer::onItemClicked(Item::Item_Dictionary type, int index)
 
 	switch (type)
 	{
-	case Item::Item_Dictionary::WOOD:
+	case ItemManager::Item::Item_Dictionary::WOOD:
 		m_itemClickMenu->SetTitle("Wood");
 		m_itemClickMenu->SetPosition(sf::Vector2f(Application::getMouseCoords().x, Application::getMouseCoords().y - (m_itemClickMenu->GetRequisition().y / 2)));
 		m_desktop.BringToFront(m_itemClickMenu);
@@ -207,8 +207,8 @@ void StorageContainer::update(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>&
 
 	if (m_sprite.getGlobalBounds().contains(Application::getWorldCoords()) && keyboardMap.isActive(Keys::RIGHTMOUSEPRESSED))
 	{
-		if (checkDist(m_context->getPlayerContext().getPos()) >= 90)
-			std::cout << "Too far away to interact with that container!" << std::endl;
+		if (checkDist(Player::getPos()) >= 90)
+			Player::getConsole().sendMessage("You're too far away to interact with that container!");
 
 		else
 		{

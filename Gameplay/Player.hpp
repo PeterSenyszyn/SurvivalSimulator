@@ -17,10 +17,11 @@ public:
 
 	Inventory& getInventory() { return m_inventory; }
 	Camera& getCamera() { return m_camera; }
+	ItemManager& getItemManager() { return m_itemManager; }
 
 	static Console& getConsole() { return m_console; }
 
-	void addItem(Item::Ptr item);
+	void addItem(ItemManager::Item::Ptr item);
 
 	bool getActive() { return m_active; }
 	void setActive(bool active) { m_active = active; if (!active) m_inventory.setActive(active); }
@@ -38,7 +39,7 @@ public:
 
 	//Event methods that are binded to specific buttons
 public:
-	void onCollectPress(ActionManager& actionManager);
+	void onCollectPress(ActionManager& actionManager, Action::Ptr itemActionContext);
 	void onPickupPress(World& world);
 
 private:
@@ -56,6 +57,7 @@ private:
 
 	Inventory m_inventory;
 	ExamineMenu m_examineMenu;
+	ItemManager m_itemManager;
 
 	static Console m_console;
 
@@ -63,11 +65,16 @@ private:
 	float m_sprintSpeed;
 
 	float m_stamina;
+	float m_health;
+	float m_thirst;
+	float m_encumbrance;
 
 	float m_requiredStaminaToSprint;
 
 	sf::Vector2f m_defaultCameraPos;
 	bool m_keepUpdatingCameraX, m_keepUpdatingCameraY;
+
+	int runCounter;
 
 	//Per second
 	float m_baseStaminaDegen;
@@ -86,6 +93,6 @@ private:
 
 	TileMap::TileEntityRef::Ptr m_entityRef; //The tile the player currently clicked
 
-	Item::Ptr m_itemRef; //The item the player currently clicked
+	ItemManager::Item::Ptr m_itemRef; //The item the player currently clicked
 	std::string m_itemRefId;
 };

@@ -58,6 +58,24 @@ private:
 		return fps;
 	}
 
+	void figureOutCurrentRes(sf::Vector2u res)
+	{
+		if (res.x == 1024 && res.y == 768)
+			m_resolutionComboBox->SelectItem(0);
+
+		else if (res.x == 1280 && res.y == 1024)
+			m_resolutionComboBox->SelectItem(1);
+
+		else if (res.x == 1600 && res.y == 900)
+			m_resolutionComboBox->SelectItem(2);
+
+		else if (res.x == 1680 && res.y == 1050)
+			m_resolutionComboBox->SelectItem(3);
+
+		else if (res.x == 1920 && res.y == 1080)
+			m_resolutionComboBox->SelectItem(4);
+	}
+
 private:
 	sfg::ComboBox::Ptr m_resolutionComboBox;
 	sfg::ComboBox::Ptr m_maxRefreshRate;

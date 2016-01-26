@@ -2,7 +2,7 @@
 
 #include "Utility.hpp"
 #include "RightClickActionManager.hpp"
-#include "Item.hpp"
+#include "ItemManager.hpp"
 
 class Inventory;
 struct Grid;
@@ -21,8 +21,8 @@ public:
 
 	const sf::Sprite& getSprite() { return m_sprite; }
 
-	void addItem(Item::Ptr item);
-	void deleteItem(Item::Ptr);
+	void addItem(ItemManager::ItemManager::Item::Ptr item);
+	void deleteItem(ItemManager::ItemManager::Item::Ptr);
 	void takeItem();
 
 	void initRightClickActions();
@@ -36,7 +36,7 @@ public:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 private:
-	void onItemClicked(Item::Item_Dictionary type, int index);
+	void onItemClicked(ItemManager::Item::Item_Dictionary type, int index);
 
 	int checkDist(const sf::Vector2f& vec);
 

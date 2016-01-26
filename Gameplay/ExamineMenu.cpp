@@ -4,12 +4,13 @@
 #include "Player.hpp"
 #include "Application.hpp"
 
-ExamineMenu::ExamineMenu(Player* player)
+ExamineMenu::ExamineMenu(Player& player)
 {
 	m_font = std::make_shared<sf::Font>();
 	m_font->loadFromFile("Assets/font.ttf");
 
-	initActions(player);
+	ItemManager::loadItemData("items.dat");
+	initActions(&player);
 
 	m_desktop.GetEngine().GetResourceManager().SetDefaultFont(m_font);
 	m_desktop.SetProperty("*", "FontName", "Assets/font.ttf");
@@ -47,9 +48,9 @@ void ExamineMenu::init(TileMap::TileEntityRef::Ptr entityRef, Player* player)
 
 	if (entityRef->collectable)
 	{
-		m_buttonBox->Pack(m_actionManager.getActionContext("harvestwood")->button);
+		m_buttonBox->Pack(m_actionManager.getActionContext("harvest" + entityRef->menuId)->button);
 
-		m_actionManager.getActionContext("harvestwood")->button->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&Player::onCollectPress, player, m_actionManager));
+		m_actionManager.getActionContext("harvest" + entityRef->menuId)->button->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&Player::onCollectPress, player, m_actionManager, m_actionManager.getActionContext("harvest" + entityRef->menuId)));
 	}
 
 	m_buttonBox->Pack(m_actionManager.getActionContext("close")->button);
@@ -64,7 +65,7 @@ void ExamineMenu::init(TileMap::TileEntityRef::Ptr entityRef, Player* player)
 	m_window->Add(m_buttonBox);
 }
 
-void ExamineMenu::init(Item::Ptr itemRef, Player* player, World& world)
+void ExamineMenu::init(ItemManager::Item::Ptr itemRef, Player* player, World& world)
 {
 	setActive(true);
 
@@ -94,7 +95,7 @@ void ExamineMenu::handleEvents(const sf::Event& event)
 		m_desktop.HandleEvent(event);
 }
 
-void ExamineMenu::update(sf::Time dt, Player* player)
+void ExamineMenu::update(sf::Time dt, Player& player)
 {
 	if (m_active)
 	{
@@ -104,22 +105,19 @@ void ExamineMenu::update(sf::Time dt, Player* player)
 	}
 }
 
-void ExamineMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
-{
-
-}
-
 void ExamineMenu::initActions(Player* player)
 {
 	//For clicking on tile entities
-	m_actionManager.createAction(5.0, "harvestwood", "Harvest Wood", std::bind(&Player::addItem, player, Item::create(Item::Item_Dictionary::WOOD, "Wood", "Assets/logs.png", "Assets/logs.png", false, true, true)));
+	m_actionManager.createAction(5.0, "harvesttree", "Harvest Wood", std::bind(&Player::addItem, player, player->getItemManager().createItemRef("Wood")));
+	m_actionManager.createAction(3.5, "harvestberrybush", "Harvest Berries", std::bind(&Player::addItem, player, player->getItemManager().createItemRef("Berry")));
+
 	m_actionManager.createAction(0.0, "close", "Close", [] {});
 
 	//For clicking on items that dropped on the ground
 	m_actionManager.createAction(0.0, "pickup", "Pick up", [this] { m_window->Show(false); });
 }
 
-void Action::update(sfg::ProgressBar::Ptr progressBar, Player* player)
+void Action::update(sfg::ProgressBar::Ptr progressBar, Player& player)
 {
 	if ((actionClock.getElapsedTime().asSeconds() / actionTime >= 1.0) || (actionTime == 0.0))
 	{
@@ -129,7 +127,7 @@ void Action::update(sfg::ProgressBar::Ptr progressBar, Player* player)
 		finishedMethod();
 	}
 
-	else if (player->checkDistanceTileRef() >= 90)
+	else if (player.checkDistanceTileRef() >= 90)
 	{
 		active = false;
 		progressBar->SetFraction(0.0);

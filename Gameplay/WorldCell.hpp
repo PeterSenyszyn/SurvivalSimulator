@@ -30,13 +30,13 @@ public:
 
 	static TileMap& getTileMap() { return m_tileMap; }
 
-	std::map<std::string, Item::Ptr>& getWorldItems() { return m_worldItems; }
+	std::map<std::string, ItemManager::Item::Ptr>& getWorldItems() { return m_worldItems; }
 	std::map<std::string, StorageContainer::Ptr>& getWorldContainers() { return m_storageContainers; }
 
 	const bool hasOpenContainer() const;
 	StorageContainer::Ptr getOpenContainer();
 
-	void addWorldItem(Item::Ptr item);
+	void addWorldItem(ItemManager::Item::Ptr item);
 	void addWorldContainer(StorageContainer::Ptr container);
 
 	bool collidesWithContainer(const sf::FloatRect& rect);
@@ -49,7 +49,7 @@ private:
 
 	static TileMap m_tileMap;
 
-	std::map<std::string, Item::Ptr> m_worldItems;
+	std::map<std::string, ItemManager::Item::Ptr> m_worldItems;
 	std::map<std::string, StorageContainer::Ptr> m_storageContainers;
 
 	bool m_current;

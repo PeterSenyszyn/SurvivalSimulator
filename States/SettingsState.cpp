@@ -41,6 +41,8 @@ void SettingsState::initGui()
 	m_resolutionComboBox->AppendItem("1680 x 1050");
 	m_resolutionComboBox->AppendItem("1920 x 1080");
 
+	figureOutCurrentRes(Application::getCurrentResolution());
+
 	auto refreshRateLabel = sfg::Label::Create("Max Refresh Rate");
 	refreshRateLabel->SetId("refreshRateLabel");
 	guiManager.setDesktopProperty(std::string("#refreshRateLabel"), std::string("FontSize"), adjustForResX(20.f));
@@ -75,9 +77,9 @@ void SettingsState::initGui()
 	tempMainWindow->Add(notebook);
 	centerWindowX(tempMainWindow);
 
-	int posRes = 0;
+	//int posRes = 0;
 	//m_sceneManager.getSettingsParser().get("posRes", posRes);
-	m_resolutionComboBox->SelectItem(posRes);
+	//m_resolutionComboBox->SelectItem(posRes);
 
 	int posRefresh = 0;
 	//m_sceneManager.getSettingsParser().get("posRefresh", posRefresh);
@@ -119,9 +121,15 @@ void SettingsState::updateSettings()
 		Application::setCurrentResolution(res);
 		Application::setResized(true);
 
-		requestGuiScale();
+		m_resolutionComboBox->AppendItem("1024 x 768");
+		m_resolutionComboBox->AppendItem("1280 x 1024");
+		m_resolutionComboBox->AppendItem("1600 x 900");
+		m_resolutionComboBox->AppendItem("1680 x 1050");
+		m_resolutionComboBox->AppendItem("1920 x 1080");
 
-		//requestStackPush(States::Intro);
+		figureOutCurrentRes(res);
+
+		requestGuiScale();
 	}
 
 	/*if (fps > 0.f && fps <= 300.f)

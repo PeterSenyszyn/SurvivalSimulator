@@ -1,7 +1,8 @@
 #pragma once
 
 #include <iostream>
-#include <map>
+#include <vector>
+#include <cmath>
 
 #include <SFML/Graphics.hpp>
 
@@ -23,7 +24,7 @@ public:
 	void handleEvents(const sf::Event& event);
 	void update(sf::Time dt);
 
-	void sendMessage(const std::string& message, bool devOnly);
+	void sendMessage(const std::string& message);
 
 private:
 	sfg::Desktop m_desktop;
@@ -37,8 +38,9 @@ private:
 
 	sfg::Box::Ptr m_consoleScrollBin;
 
-	std::map<std::string, bool> m_messages;
-	std::vector<sfg::Label::Ptr> m_texts;
+	std::vector<std::string> m_messages;
+	sfg::Label::Ptr m_guiMessage;
+	//std::map<std::string, sfg::Label::Ptr> m_messageMap;
 
 	bool m_active;
 	bool m_devMode;

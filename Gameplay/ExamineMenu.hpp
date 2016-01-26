@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Item.hpp"
+#include "ItemManager.hpp"
 #include "World.hpp"
 
 class Player;
@@ -9,12 +9,12 @@ struct Action
 {
 	typedef std::shared_ptr<Action> Ptr;
 
-	Action(float actionTime, const std::string& actionName, std::function<void()> finishedMethod) :
-		actionTime(actionTime), actionName(actionName), active(false), finishedMethod(finishedMethod) {};
+	Action(float actionTime, const std::string& actionName, const std::string& name, std::function<void()> finishedMethod) :
+		actionTime(actionTime), actionName(actionName), name(name), active(false), finishedMethod(finishedMethod) {};
 
 	static Ptr create(float actionTime, const std::string& id, const std::string& actionName, std::function<void()>& finishedMethod)
 	{
-		Ptr temp = Ptr(new Action(actionTime, actionName, finishedMethod));
+		Ptr temp = Ptr(new Action(actionTime, actionName, id, finishedMethod));
 
 		temp->button = sfg::Button::Create(actionName);
 		temp->button->SetId(id);
@@ -22,7 +22,7 @@ struct Action
 		return temp;
 	}
 
-	void update(sfg::ProgressBar::Ptr progressBar, Player* player);
+	void update(sfg::ProgressBar::Ptr progressBar, Player& player);
 
 	sfg::Button::Ptr button;
 	sf::Clock actionClock;
@@ -30,6 +30,7 @@ struct Action
 
 	bool active;
 	std::string actionName;
+	std::string name; //Ex: "harvestwood"
 
 	std::function<void()> finishedMethod;
 };
@@ -39,7 +40,8 @@ class ActionManager
 public:
 	void createAction(float actionTime, const std::string& id, const std::string& actionName, std::function<void()> finishedMethod)
 	{
-		actions[id] = Action::create(actionTime, id, actionName, finishedMethod);
+		if (actions.find(id) == actions.end())
+			actions[id] = Action::create(actionTime, id, actionName, finishedMethod);
 	}
 
 	void resetAllGui()
@@ -73,7 +75,7 @@ public:
 		return nullptr;
 	}
 
-	void update(sfg::ProgressBar::Ptr progressBar, Player* player)
+	void update(sfg::ProgressBar::Ptr progressBar, Player& player)
 	{
 		for (auto& iter : actions)
 		{
@@ -89,13 +91,13 @@ private:
 class ExamineMenu
 {
 public:
-	ExamineMenu(Player* player);
+	ExamineMenu(Player& player);
 
 	void init(TileMap::TileEntityRef::Ptr entityRef, Player* player); //Every time the player examines something new, the menu needs to be reinitialized
-	void init(Item::Ptr itemRef, Player* player, World& world);
+	void init(ItemManager::Item::Ptr itemRef, Player* player, World& world);
 
 	void handleEvents(const sf::Event& event);
-	void update(sf::Time dt, Player* player);
+	void update(sf::Time dt, Player& player);
 
 	sfg::Window::Ptr getWindow() { return m_window; }
 	ActionManager& getActionManager() { return m_actionManager; }
@@ -107,8 +109,6 @@ public:
 		m_active = active;
 		m_window->Show(m_active);
 	}
-
-	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 private:
 	void initActions(Player* player);

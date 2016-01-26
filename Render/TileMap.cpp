@@ -7,7 +7,8 @@ unsigned int TileMap::m_ySize = 0;
 TileMap::TileMap() :
 	m_active(false)
 {
-	m_tileEntityRef.push_back(TileEntityRef::Ptr(new TileEntityRef(13, "Tree", false, true)));
+	m_tileEntityRef.push_back(TileEntityRef::Ptr(new TileEntityRef(13, "Tree", "tree", false, true)));
+	m_tileEntityRef.push_back(TileEntityRef::Ptr(new TileEntityRef(15, "Berry Bush", "berrybush", false, true)));
 }
 
 bool TileMap::load(const std::string& filepath, sf::Vector2u tileSize, const int* tiles, unsigned int width, unsigned int height)

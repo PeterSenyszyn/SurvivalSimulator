@@ -7,6 +7,7 @@
 #include "SettingsState.hpp"
 #include "GameState.hpp"
 #include "LoadingScreenState.hpp"
+#include "ItemManager.hpp"
 
 #include <iostream>
 

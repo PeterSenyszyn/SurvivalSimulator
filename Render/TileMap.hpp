@@ -23,12 +23,13 @@ public:
 	{
 		typedef std::shared_ptr<TileEntityRef> Ptr;
 
-		TileEntityRef(int tileType, const std::string& tileName, bool pickUppable, bool collectable) :
-			tileType(tileType), tileName(tileName), pickUppable(pickUppable), collectable(collectable) {};
+		TileEntityRef(int tileType, const std::string& tileName, const std::string& menuId, bool pickUppable, bool collectable) :
+			tileType(tileType), tileName(tileName), menuId(menuId), pickUppable(pickUppable), collectable(collectable) {};
 
 		int tileType;
 		sf::Vector2f pos;
 		std::string tileName;
+		std::string menuId;
 
 		bool pickUppable;
 		bool collectable;

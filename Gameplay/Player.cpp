@@ -12,20 +12,21 @@ Player::Player(sf::RenderWindow& context) :
 	m_walkSpeed(75.0f),
 	m_sprintSpeed(140.0f),
 	m_stamina(100.0f),
+	m_health(100.f),
+	m_thirst(100.f),
+	m_encumbrance(0.f),
 	m_requiredStaminaToSprint(20.0f),
-	m_defaultCameraPos(adjustForResX(1920) / 2, adjustForResY(1080) / 2),
 	m_keepUpdatingCameraX(false),
 	m_keepUpdatingCameraY(false),
+	runCounter(0),
 	m_baseStaminaDegen(9.0f),
 	m_baseStaminaRegen(3.5f),
-	m_inventoryWeight(0.0),
 	m_isSprinting(false),
 	m_isWalking(false),
 	m_isCurrentlyMoving(false),
-	m_examineMenu(this),
-	m_inventory(*this),
-	m_camera(sf::FloatRect({ adjustForResX(1500), adjustForResY(750) }, { adjustForResX(1920),
-							 adjustForResY(1080) }), m_sprite)
+	m_examineMenu(*this),
+	m_camera(sf::FloatRect({ adjustForResX(1500), adjustForResY(750) }, { adjustForResX(Application::getCurrentResolution().x), 
+		adjustForResY(Application::getCurrentResolution().y)}), m_sprite)
 {
 	m_image.loadFromFile("Assets/Player/player_temp.png");
 	m_image.createMaskFromColor(sf::Color::White);
@@ -45,7 +46,7 @@ void Player::init()
 	m_camera.getView().setCenter(m_sprite.getPosition());
 }
 
-void Player::addItem(Item::Ptr item)
+void Player::addItem(ItemManager::Item::Ptr item)
 {
 	m_inventory.addItem(item);
 }
@@ -90,19 +91,22 @@ void Player::update(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys, Wor
 		updateMovement(dt, keys, world);
 		updateInput(dt, keys, world);
 		m_inventory.update(dt);
-		m_examineMenu.update(dt, this);
+		m_inventory.updatePlayerInfo(m_health, m_thirst, m_encumbrance, m_stamina);
+		m_examineMenu.update(dt, *this);
 		m_camera.update(dt);
 		m_console.update(dt);
+
+		if (runCounter == 1)
+			m_defaultCameraPos = sf::Vector2f(m_camera.getPlayerMappedCoords().x, m_camera.getPlayerMappedCoords().y);
+
+		runCounter++;
 	}
 }
 
 void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	if (m_active)
-	{
-		target.draw(m_inventory, states);
 		target.draw(m_sprite, states);
-	}
 }
 
 void Player::updateMovement(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys, World& world)
@@ -128,7 +132,7 @@ void Player::updateMovement(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& k
 		m_isSprinting = false;
 	}
 
-	//Do all the stamina degen/regen here
+	//Do all the stamina degen/regen calculations here
 	if (m_isSprinting)
 		m_stamina -= m_baseStaminaDegen * dt.asSeconds();
 
@@ -268,27 +272,26 @@ void Player::updateInput(sf::Time dt, thor::ActionMap<Keys::KeyboardInput>& keys
 	}
 
 	else if (keys.isActive(Keys::MPRESS))
-		m_inventory.getWorldCellContext().addWorldContainer(StorageContainer::create(20, "Assets/topdown_tiles/chest_closed.png", "Assets/topdown_tiles/chest_open.png", sf::Vector2f(200, 1000), m_inventory));
+		world.getCurrentCell()->addWorldContainer(StorageContainer::create(20, "Assets/topdown_tiles/chest_closed.png", "Assets/topdown_tiles/chest_open.png", sf::Vector2f(200, 1000), m_inventory));
 
 	else if (keys.isActive(Keys::CPRESS))
 		m_console.setActive(!m_console.getActive());
 }
 
 //Event implementation
-void Player::onCollectPress(ActionManager& actionManager)
+void Player::onCollectPress(ActionManager& actionManager, Action::Ptr itemActionContext)
 {
 	if (m_entityRef != nullptr)
 	{
-		//Make sure the player is near the tree (90 pixels at least)
-		if (checkDistanceTileRef() < 90)
+		if (itemActionContext->actionName == "Harvest Wood" || itemActionContext->actionName == "Harvest Berries")
 		{
-			actionManager.getActionContext("harvestwood")->actionClock.restart();
+			if (checkDistanceTileRef() < 90)
+			{
+				actionManager.getActionContext(itemActionContext->name)->actionClock.restart();
 
-			actionManager.setActiveAction("harvestwood");
+				actionManager.setActiveAction(itemActionContext->name);
+			}
 		}
-
-		else
-			std::cout << "You're too far away to interact with that object!" << std::endl;
 	}
 }
 

@@ -17,7 +17,7 @@ WorldCell::Ptr WorldCell::create(const std::string& id, bool current)
 	return temp;
 }
 
-void WorldCell::addWorldItem(Item::Ptr item)
+void WorldCell::addWorldItem(ItemManager::Item::Ptr item)
 {
 	item->setActive(true);
 	m_worldItems[std::to_string(m_worldItems.size() - 1)] = item;

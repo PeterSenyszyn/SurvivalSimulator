@@ -96,7 +96,7 @@ void IntroState::initGui()
 
 	centerWindowX(mainWindow);
 
-	loadWindow->SetPosition({ adjustForResX(1200), adjustForResY(191) });
+	loadWindow->SetPosition({ mainWindow->GetAbsolutePosition().x + adjustForResX(650), mainWindow->GetAbsolutePosition().y + adjustForResY(198) });
 	settingsButton->SetRequisition(sf::Vector2f(adjustForResX(200), adjustForResY(100)));
 }
 
